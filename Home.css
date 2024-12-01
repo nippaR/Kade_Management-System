@@ -1,0 +1,141 @@
+/* Base styling for the home component */
+.home {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 101vh;
+  background: url('../images/Background1.png') no-repeat center center/cover;
+  color: white;
+  font-family: 'Arial', sans-serif;
+  position: relative;
+  padding-top: 80px; /* Ensure content doesn't overlap with header */
+}
+
+/* Header Styling */
+
+/* Footer Styling */
+.footer {
+  background: #1a0024;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  width: 97.4%;
+}
+
+.footer p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.footer .social-links a {
+  color: #8149de;
+  text-decoration: none;
+  margin: 0 10px;
+  transition: color 0.3s ease;
+}
+
+.footer .social-links a:hover {
+  color: white;
+}
+
+/* Text container styling */
+.text-container {
+  position: absolute;
+  top: 25%;
+  left: 10%;
+  text-align: left;
+  color: white;
+  max-width: 40%;
+}
+
+.title {
+  font-size: 4rem;
+  font-weight: bold;
+  margin: 0;
+  line-height: 1.2;
+  font-family: 'Space+Grotesk', sans-serif; /* Add a custom font for better match */
+}
+
+.subtitle {
+  font-size: 1.5rem;
+  margin-top: 1rem;
+}
+
+/* Button styling */
+.get-start-btn {
+  position: absolute;
+  bottom: 15%;
+  right: 10%;
+  padding: 15px 30px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  background: linear-gradient(90deg, #8149de, #5a33a9);
+  color: white;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(129, 73, 222, 0.4);
+  transition: all 0.3s ease;
+}
+
+.get-start-btn:hover {
+  background: linear-gradient(90deg, #5a33a9, #8149de);
+  box-shadow: 0 8px 20px rgba(90, 51, 169, 0.6);
+}
+
+/* Image Container Styling */
+.image-container {
+  position: absolute;
+  right: 10%;
+  top: 50%;
+  transform: translateY(-60%);
+}
+
+.decorative-image {
+  width: 500px;
+  height: auto;
+  border-radius: 90px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Animation container styling */
+.animation-container {
+  position: absolute;
+  left: 20%;
+  top: 60%;
+  transform: translateY(-50%);
+}
+
+.animated-shape {
+  background: radial-gradient(circle, #ff6cf5, #d49ff5);
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  box-shadow: 0 0 20px #ffffff88;
+  animation: float 3s infinite ease-in-out, rotate 6s infinite linear;
+}
+
+/* Animation keyframes */
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
