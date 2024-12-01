@@ -1,1 +1,0 @@
-# Kade_Management-System
