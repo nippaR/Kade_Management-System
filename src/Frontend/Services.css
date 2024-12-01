@@ -1,0 +1,104 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: url('../images/Reviews.png') no-repeat center center fixed;
+  background-size: cover;
+}
+
+.about-page, .services-page {
+  text-align: center;
+  padding: 20px;
+}
+
+.text-section {
+  margin: 20px;
+  color: #f9f9f9;
+}
+
+.h2 {
+  color: #ffffffe5;
+}
+
+.h1 {
+  color: #161515;
+}
+
+.next-button {
+  padding: 10px 30px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #141e30;
+  background: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.next-button:hover {
+  background: #f7b42c;
+  transform: scale(1.05);
+}
+
+.next-button:active {
+  transform: scale(0.95);
+}
+
+.services-container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin: 20px;
+}
+
+.service-card {
+  background-color: #fff;
+  border-radius: 30px;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width: 26%;
+  text-align: center;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.service-card:hover {
+  transform: translateY(-10px) scale(1.05); /* Animate upward and scale */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Add a deeper shadow */
+}
+
+.service-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 9px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.service-card:hover img {
+  transform: scale(1.05); /* Slightly zoom the image */
+}
+
+.service-card h3 {
+  color: #007bff;
+  margin: 10px 0;
+}
+
+.hi1 {
+  color: #000000;
+}
+
+.footer2 {
+  margin-top: 20px;
+  background: #080808;
+  color: #fff;
+  padding: 10px 0;
+  padding: 5px;
+
+}
+
+.footer2 .social-links a {
+  color: #8149de;
+  margin: 0 10px;
+  text-decoration: none;
+}

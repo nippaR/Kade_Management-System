@@ -1,0 +1,147 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Space Grotesk', sans-serif;
+    background: linear-gradient(135deg, #141e30, #243b55);
+    color: #fff;
+  }
+  
+  .contact-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 20px;
+    background: url('../images/Background1.png') no-repeat center center fixed;
+    background-size: cover;
+  }
+  
+  .contact-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%;
+    max-width: 1200px;
+  }
+  
+  .contact-info {
+    flex: 1;
+    padding: 20px;
+  }
+  
+  .contact-title {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #f9f9f9;
+  }
+  
+  .contact-details p {
+    margin: 10px 0;
+    font-size: 1.2rem;
+    color: #f9f9f9;
+  }
+  
+  .contact-details strong {
+    font-size: 1.3rem;
+    color: #f7b42c;
+  }
+
+  .footer3 {
+    margin-top: 20px;
+    background: #080808;
+    color: #fff;
+    padding: 10px 0;
+    padding: 10px;
+    width: 97.4%;
+  
+  }
+
+  .footer3 p {
+    margin: 0;
+    font-size: 1rem;
+  }
+  
+  .footer3 .social-links a {
+    color: #8149de;
+    margin: 0 10px;
+    text-decoration: none;
+  }
+  
+  
+  .social-icons {
+    margin-top: 10px;
+  }
+  
+  .social-link {
+    font-size: 1.8rem;
+    color: #f7b42c;
+    margin: 0 10px;
+    transition: color 0.3s ease-in-out, transform 0.3s ease-in-out;
+  }
+  
+  .social-link:hover {
+    color: #fff;
+    transform: scale(1.2);
+  }
+  
+  .contact-animation {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .globe-image {
+    width: 400px;
+    height: 400px;
+    animation: rotate 10s linear infinite;
+    top: 20%;
+  }
+
+  /* Styling for the decorative image */
+.image-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.decorative-image {
+  width: 400px;
+  height: auto;
+  animation: float 4s ease-in-out infinite;
+}
+  
+  /* Animation for rotating the globe */
+  @keyframes rotate {
+    0% {
+      transform: rotateY(0deg);
+    }
+    100% {
+      transform: rotateY(360deg);
+    }
+  }
+  
+  .next-button {
+    margin-top: 30px;
+    padding: 10px 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #141e30;
+    background: #f7b42c;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.3s;
+  }
+  
+  .next-button:hover {
+    background: #f9f9f9;
+    transform: scale(1.05);
+  }
+  
+  .next-button:active {
+    transform: scale(0.95);
+  }
+  
