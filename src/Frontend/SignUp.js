@@ -59,7 +59,7 @@ const SignUp = () => {
 
   return (
     <div className="auth-page">
-      <h1 className="auth-title">Kade Management System</h1>
+      <h1 className="auth-title">Kade.LK Management System</h1>
       <form className="auth-form" onSubmit={handleSubmit}>
         <h2>Sign Up</h2>
         {error && <p className="auth-error">{error}</p>}

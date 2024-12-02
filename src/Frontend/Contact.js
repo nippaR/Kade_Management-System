@@ -64,7 +64,7 @@ const Contact = () => {
       </div>
 
       <footer className="footer3">
-        <p>&copy; 2024 KADE Management System. All rights reserved.</p>
+        <p>&copy; 2024 KADE.LK Management System. All rights reserved.</p>
         <div className="social-links">
           <a href="#facebook">Facebook</a>
           <a href="#twitter">Twitter</a>

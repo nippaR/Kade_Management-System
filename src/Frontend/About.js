@@ -13,10 +13,10 @@ const About = () => {
       <div className="content">
         
         <div className="text-section">
-          <h1>About Kade Management System</h1>
+          <h1>About Kade.LK Management System</h1>
           <br></br>
           <p className="text">
-            Welcome to the <strong>Kade Management System</strong>, a purpose-built digital
+            Welcome to the <strong className="java">Kade.LK Management System</strong>, a purpose-built digital
             solution designed to empower small and medium-sized retail businesses. Our
             platform simplifies inventory management, sales tracking, and supplier
             coordination, making it easier for shop owners to focus on growing their
@@ -44,7 +44,7 @@ const About = () => {
       <br></br>
       
       <footer className="footer1">
-        <p>&copy; 2024 KADE Management System. All rights reserved.</p>
+        <p>&copy; 2024 KADE.LK Management System. All rights reserved.</p>
         <div className="social-links">
           <a href="#facebook">Facebook</a>
           <a href="#twitter">Twitter</a>

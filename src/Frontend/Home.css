@@ -11,8 +11,6 @@
   padding-top: 80px; /* Ensure content doesn't overlap with header */
 }
 
-/* Header Styling */
-
 /* Footer Styling */
 .footer {
   background: #1a0024;
@@ -57,6 +55,14 @@
   margin: 0;
   line-height: 1.2;
   font-family: 'Space+Grotesk', sans-serif; /* Add a custom font for better match */
+}
+
+.kade-text-image {
+  width: 300px; /* Size of the Sinhala text image */
+  height: auto;
+  display: inline-block;
+  vertical-align: middle;
+  margin-bottom: 20px;
 }
 
 .subtitle {

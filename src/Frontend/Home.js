@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
 import animate1 from "../images/animate1.png";
+import kadeText from "../images/kade2.png"; // Import the Sinhala text image
 
 const Home = () => {
   const navigate = useNavigate(); // Hook for navigation
@@ -11,7 +12,8 @@ const Home = () => {
       <div className="home">
         <div className="text-container">
           <h1 className="title">
-            KADE.LK <br />
+            <img src={kadeText} alt="KADE" className="kade-text-image" />
+            <br />
             MANAGEMENT <br />
             SYSTEM
           </h1>
@@ -29,7 +31,7 @@ const Home = () => {
       </div>
 
       <footer className="footer">
-        <p>&copy; 2024 KADE Management System. All rights reserved.</p>
+        <p>&copy; 2024 KADE.LK Management System. All rights reserved.</p>
         <div className="social-links">
           <a href="#facebook">Facebook</a>
           <a href="#twitter">Twitter</a>
