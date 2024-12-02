@@ -43,25 +43,25 @@ const Contact = () => {
         </div>
         <div className="contact-animation">
           {/* Add a rotating 3D globe or a placeholder */}
-          {/* <img
+          { <img
             src={require("../assets/globe-placeholder.png")}
             alt="3D Globe"
             className="globe-image"
-          /> */}
+          /> }
         </div>
       </div>
-      <button className="next-button" onClick={() => navigate("/about")}>
+      <button className="next-button" onClick={() => navigate("/SignIn")}>
         NEXT
       </button>
 
       {/* Image Section Below */}
-      {/* <div className="image-section">
+      { <div className="image-section">
         <img
           src={require("../assets/contact-background.png")}
           alt="Decorative Globe Background"
           className="decorative-image"
         />
-      </div> */}
+      </div> }
 
       <footer className="footer3">
         <p>&copy; 2024 KADE Management System. All rights reserved.</p>

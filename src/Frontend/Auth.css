@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+.auth-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: url("../images/lBackground.jpg") no-repeat center center;
+  background-size: cover;
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.auth-title {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  color: #0f0e10;
+  text-shadow: #f00f0f;
+  border-color: #f00f0f;
+}
+
+.auth-form {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.auth-form h2 {
+  margin-bottom: 20px;
+}
+
+.auth-form input {
+  width: 70%;
+  margin: 25px 0;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.auth-form button {
+  width: 100%;
+  padding: 10px;
+  background: #f7b42c;
+  color: #141e30;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.auth-form button:hover {
+  transform: scale(1.05);
+}
+
+.auth-form p {
+  margin-top: 15px;
+}
+
+.auth-form span {
+  color: #f7b42c;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.auth-error {
+  color: red;
+  font-size: 0.9rem;
+}
