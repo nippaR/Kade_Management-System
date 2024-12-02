@@ -11,7 +11,7 @@ const Home = () => {
       <div className="home">
         <div className="text-container">
           <h1 className="title">
-            KADE <br />
+            KADE.LK <br />
             MANAGEMENT <br />
             SYSTEM
           </h1>
