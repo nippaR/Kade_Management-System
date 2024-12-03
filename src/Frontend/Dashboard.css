@@ -185,3 +185,70 @@
     padding: 0;
   }
 }
+
+:root {
+  /* Light Mode Colors */
+  --background-color: #ffffff;
+  --text-color: #333333;
+  --primary-color: #4caf50;
+  --secondary-color: #2196f3;
+  --accent-color: #ff9800;
+}
+
+[data-theme="dark"] {
+  /* Dark Mode Colors */
+  --background-color: #121212;
+  --text-color: #e0e0e0;
+  --primary-color: #81c784;
+  --secondary-color: #64b5f6;
+  --accent-color: #ffa726;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: Arial, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+button {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: var(--secondary-color);
+}
+
+.panel {
+  background-color: var(--background-color);
+  border: 1px solid var(--accent-color);
+  padding: 20px;
+  border-radius: 10px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* styles.css */
+
+/* Light theme styles */
+[data-theme="light"] {
+  --background-color: #fff;
+  --text-color: #000;
+}
+
+/* Dark theme styles */
+[data-theme="dark"] {
+  --background-color: #333;
+  --text-color: #fff;
+}
+
+/* Apply the variables throughout your app */
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}

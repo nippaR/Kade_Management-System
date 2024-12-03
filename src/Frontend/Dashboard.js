@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Line, Bar, Pie } from "react-chartjs-2";
 import {
@@ -14,7 +14,7 @@ import {
   ArcElement,
 } from "chart.js";
 import "./Dashboard.css";
-import kadeText from "../images/kade2.png";  // Importing the logo image
+import kadeText from "../images/kade2.png"; // Importing the logo image
 
 // Registering necessary ChartJS components
 ChartJS.register(
@@ -34,6 +34,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const user = location.state?.user || { name: "Guest", email: "guest@example.com", profilePicture: null };
   const [searchQuery, setSearchQuery] = useState("");
+  const [isDarkMode, setIsDarkMode] = useState(false); // State to toggle dark mode
 
   const handleSearch = () => {
     if (!searchQuery.trim()) {
@@ -63,9 +64,8 @@ const Dashboard = () => {
       if (response.ok) {
         alert("Profile picture uploaded successfully!");
         const data = await response.json();
-        // Update the profile picture in the state
-        user.profilePicture = data.profilePicture; 
-        window.location.reload(); // Refresh the page to reflect the changes
+        user.profilePicture = data.profilePicture;
+        window.location.reload();
       } else {
         alert("Failed to upload profile picture.");
       }
@@ -73,7 +73,13 @@ const Dashboard = () => {
       console.error(err);
     }
   };
-  
+
+  const toggleDarkMode = () => {
+    const htmlElement = document.documentElement;
+    const newMode = isDarkMode ? "light" : "dark";
+    htmlElement.setAttribute("data-theme", newMode);
+    setIsDarkMode(!isDarkMode); // Update state
+  };
 
   // Sample data for Visitor Insights
   const visitorData = {
@@ -102,17 +108,12 @@ const Dashboard = () => {
 
   // Sample data for Total Revenue
   const salesData = {
-    labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+    labels: ["Q1", "Q2", "Q3", "Q4"],
     datasets: [
       {
-        label: "Online Sales",
-        data: [5000, 7000, 8000, 10000, 11000, 12000, 15000],
-        backgroundColor: "#4CAF50",
-      },
-      {
-        label: "Offline Sales",
-        data: [3000, 4000, 5000, 6000, 7000, 8000, 9000],
-        backgroundColor: "#2196F3",
+        label: "Total Revenue",
+        data: [5000, 10000, 7500, 12000],
+        backgroundColor: ["#4CAF50", "#2196F3", "#FF9800", "#9C27B0"],
       },
     ],
   };
@@ -122,8 +123,7 @@ const Dashboard = () => {
     labels: ["Very Satisfied", "Satisfied", "Neutral", "Dissatisfied", "Very Dissatisfied"],
     datasets: [
       {
-        label: "Customer Satisfaction",
-        data: [50, 30, 10, 7, 3],
+        data: [50, 30, 10, 5, 5],
         backgroundColor: ["#4CAF50", "#8BC34A", "#FFEB3B", "#FF9800", "#F44336"],
       },
     ],
@@ -134,28 +134,27 @@ const Dashboard = () => {
     labels: ["Product A", "Product B", "Product C", "Product D"],
     datasets: [
       {
-        label: "Sales",
-        data: [40, 25, 20, 15],
-        backgroundColor: ["#4CAF50", "#2196F3", "#FF9800", "#FF5722"],
+        data: [300, 200, 150, 100],
+        backgroundColor: ["#2196F3", "#4CAF50", "#FF9800", "#9C27B0"],
       },
     ],
   };
 
   return (
-    <div className="dashboard">
+    <div className={`dashboard ${isDarkMode ? "dark-mode" : "light-mode"}`}>
       <aside className="sidebar">
-      <h2 className="sidebar-title">
-          <img src={kadeText} alt="Logo" className="sidebar-logo" /> 
-    </h2>
+        <h2 className="sidebar-title">
+          <img src={kadeText} alt="Logo" className="sidebar-logo" />
+        </h2>
         <ul className="sidebar-menu">
           <li className="sidebar-item">Dashboard</li>
-          <li className="sidebar-item"> Product Management</li>
+          <li className="sidebar-item">Product Management</li>
           <li className="sidebar-item">Sales Management</li>
-          <li className="sidebar-item"> Inventory Monitoring</li>
+          <li className="sidebar-item">Inventory Monitoring</li>
           <li className="sidebar-item">Supplier Management</li>
           <li className="sidebar-item">Reorder Management</li>
           <li className="sidebar-item">User Management</li>
-          <li className="sidebar-item"> Reporting and Analytics</li>
+          <li className="sidebar-item">Reporting and Analytics</li>
           <li className="sidebar-item logout" onClick={handleSignOut}>
             Sign Out
           </li>
@@ -164,13 +163,15 @@ const Dashboard = () => {
       <main className="main-content">
         <header className="dashboard-header">
           <h1 className="dashboard-title">Dashboard</h1>
+          <button className="toggle-mode" onClick={toggleDarkMode}>
+            {isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          </button>
           <div className="user-info">
-            {/* Display the profile picture if it exists */}
             {user.profilePicture && (
               <img
                 src={`http://localhost:5000/uploads/${user.profilePicture}`}
                 alt="Profile"
-                className="profile-image" // You can add a class to style the image
+                className="profile-image"
               />
             )}
             <span>{user.name}</span>
