@@ -22,8 +22,10 @@ const SignIn = () => {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message);
-      alert("Sign-In Successful! Redirecting to Home...");
-      navigate("/");
+      alert("Sign-In Successful! Redirecting to Dashboard...");
+      navigate("/dashboard", {
+        state: { user: { name: data.name, email: data.email, profilePicture: data.profilePicture } },
+      });
     } catch (err) {
       setError(err.message);
     }
