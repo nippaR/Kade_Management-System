@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Line, Bar, Pie } from "react-chartjs-2";
 import {
@@ -14,9 +14,8 @@ import {
   ArcElement,
 } from "chart.js";
 import "./Dashboard.css";
-import kadeText from "../images/kade2.png"; // Importing the logo image
+import kadeText from "../images/kade2.png"; // Logo image
 
-// Registering necessary ChartJS components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -32,9 +31,11 @@ ChartJS.register(
 const Dashboard = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const user = location.state?.user || { name: "Guest", email: "guest@example.com", profilePicture: null };
+  const user = location.state?.user || { name: "formData.username", email: "guest@example.com", profilePicture: null };
   const [searchQuery, setSearchQuery] = useState("");
-  const [isDarkMode, setIsDarkMode] = useState(false); // State to toggle dark mode
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [profilePicture, setProfilePicture] = useState(user.profilePicture);
+
 
   const handleSearch = () => {
     if (!searchQuery.trim()) {
@@ -44,101 +45,94 @@ const Dashboard = () => {
     alert(`Searching for: ${searchQuery}`);
   };
 
-  const handleSignOut = () => {
-    navigate("/SignIn");
+  const handleSignOut = () => navigate("/SignIn");
+
+  const toggleDarkMode = () => {
+    const newMode = isDarkMode ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", newMode);
+    setIsDarkMode(!isDarkMode);
   };
 
-  const handleProfilePictureUpload = async (e) => {
+  const handleProfileUpload = (e) => {
     const file = e.target.files[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("profilePicture", file);
-
-    try {
-      const response = await fetch("http://localhost:5000/api/users/upload-profile-picture", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (response.ok) {
-        alert("Profile picture uploaded successfully!");
-        const data = await response.json();
-        user.profilePicture = data.profilePicture;
-        window.location.reload();
-      } else {
-        alert("Failed to upload profile picture.");
-      }
-    } catch (err) {
-      console.error(err);
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setProfilePicture(reader.result);
+      reader.readAsDataURL(file);
     }
   };
 
-  const toggleDarkMode = () => {
-    const htmlElement = document.documentElement;
-    const newMode = isDarkMode ? "light" : "dark";
-    htmlElement.setAttribute("data-theme", newMode);
-    setIsDarkMode(!isDarkMode); // Update state
-  };
+  const handleProfileDelete = () => setProfilePicture(null);
 
-  // Sample data for Visitor Insights
-  const visitorData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-    datasets: [
-      {
-        label: "Loyal Customers",
-        data: [200, 300, 400, 350, 450, 500, 600, 700, 750, 800, 850, 900],
-        borderColor: "#4CAF50",
-        fill: false,
-      },
-      {
-        label: "New Customers",
-        data: [150, 200, 250, 300, 350, 400, 450, 400, 350, 300, 250, 200],
-        borderColor: "#2196F3",
-        fill: false,
-      },
-      {
-        label: "Unique Customers",
-        data: [100, 150, 200, 250, 300, 350, 300, 250, 200, 150, 100, 50],
-        borderColor: "#FF9800",
-        fill: false,
-      },
-    ],
-  };
+  // Example data for charts
+const visitorData = {
+  labels: ["January", "February", "March", "April", "May", "June"],
+  datasets: [
+    {
+      label: "Visitors",
+      data: [100, 200, 150, 300, 250, 400],
+      backgroundColor: "rgba(75, 192, 192, 0.2)",
+      borderColor: "rgba(75, 192, 192, 1)",
+      borderWidth: 1,
+    },
+  ],
+};
 
-  // Sample data for Total Revenue
-  const salesData = {
-    labels: ["Q1", "Q2", "Q3", "Q4"],
-    datasets: [
-      {
-        label: "Total Revenue",
-        data: [5000, 10000, 7500, 12000],
-        backgroundColor: ["#4CAF50", "#2196F3", "#FF9800", "#9C27B0"],
-      },
-    ],
-  };
+const salesData = {
+  labels: ["Q1", "Q2", "Q3", "Q4"],
+  datasets: [
+    {
+      label: "Sales",
+      data: [5000, 10000, 7500, 12000],
+      backgroundColor: "rgba(54, 162, 235, 0.2)",
+      borderColor: "rgba(54, 162, 235, 1)",
+      borderWidth: 1,
+    },
+  ],
+};
 
-  // Sample data for Customer Satisfaction
-  const customerSatisfactionData = {
-    labels: ["Very Satisfied", "Satisfied", "Neutral", "Dissatisfied", "Very Dissatisfied"],
-    datasets: [
-      {
-        data: [50, 30, 10, 5, 5],
-        backgroundColor: ["#4CAF50", "#8BC34A", "#FFEB3B", "#FF9800", "#F44336"],
-      },
-    ],
-  };
+const customerSatisfactionData = {
+  labels: ["Very Satisfied", "Satisfied", "Neutral", "Unsatisfied"],
+  datasets: [
+    {
+      data: [45, 30, 15, 10],
+      backgroundColor: [
+        "rgba(255, 99, 132, 0.2)",
+        "rgba(54, 162, 235, 0.2)",
+        "rgba(255, 206, 86, 0.2)",
+        "rgba(75, 192, 192, 0.2)",
+      ],
+      borderColor: [
+        "rgba(255, 99, 132, 1)",
+        "rgba(54, 162, 235, 1)",
+        "rgba(255, 206, 86, 1)",
+        "rgba(75, 192, 192, 1)",
+      ],
+      borderWidth: 1,
+    },
+  ],
+};
 
-  // Sample data for Product Performance
-  const productPerformanceData = {
-    labels: ["Product A", "Product B", "Product C", "Product D"],
-    datasets: [
-      {
-        data: [300, 200, 150, 100],
-        backgroundColor: ["#2196F3", "#4CAF50", "#FF9800", "#9C27B0"],
-      },
-    ],
-  };
+const productPerformanceData = {
+  labels: ["Product A", "Product B", "Product C"],
+  datasets: [
+    {
+      data: [300, 150, 200],
+      backgroundColor: [
+        "rgba(153, 102, 255, 0.2)",
+        "rgba(255, 159, 64, 0.2)",
+        "rgba(255, 205, 86, 0.2)",
+      ],
+      borderColor: [
+        "rgba(153, 102, 255, 1)",
+        "rgba(255, 159, 64, 1)",
+        "rgba(255, 205, 86, 1)",
+      ],
+      borderWidth: 1,
+    },
+  ],
+};
+
 
   return (
     <div className={`dashboard ${isDarkMode ? "dark-mode" : "light-mode"}`}>
@@ -167,18 +161,23 @@ const Dashboard = () => {
             {isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
           </button>
           <div className="user-info">
-            {user.profilePicture && (
-              <img
-                src={`http://localhost:5000/uploads/${user.profilePicture}`}
-                alt="Profile"
-                className="profile-image"
-              />
+            {profilePicture ? (
+              <div className="profile">
+                <img src={profilePicture} alt="Profile" className="profile-pic" />
+                <br></br>
+                <button onClick={handleProfileDelete}>Delete</button>
+              </div>
+            ) : (
+              <label className="upload-label">
+                Upload Profile Picture
+                <input type="file" accept="image/*" onChange={handleProfileUpload} />
+              </label>
             )}
             <span>{user.name}</span>
-            <span>{user.email}</span>
-            <input type="file" accept="image/*" onChange={handleProfilePictureUpload} />
+            <span>({user.email})</span>
           </div>
         </header>
+        {/* Rest of the code */}
         <div className="search-bar">
           <input
             type="text"

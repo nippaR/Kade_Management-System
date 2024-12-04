@@ -81,19 +81,39 @@
 .user-info {
   display: flex;
   align-items: center;
+  gap: 15px;
 }
 
-.user-info img {
-  width: 40px;
-  height: 40px;
+.profile-pic {
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  margin-right: 10px;
 }
 
-.user-info span {
-  margin-right: 10px;
-  font-size: 1em;
+.upload-label {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
 }
+
+.upload-label input[type="file"] {
+  display: none;
+}
+
+.profile button {
+  background-color: #e74c3c;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.profile button:hover {
+  background-color: #c0392b;
+}
+
 
 .user-info input[type="file"] {
   font-size: 0.9em;
