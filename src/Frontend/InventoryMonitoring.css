@@ -1,0 +1,96 @@
+.inventory-monitoring {
+    display: flex;
+  }
+  
+  .sidebar {
+    width: 250px;
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    padding: 15px;
+    height: 100vh;
+  }
+  
+  .sidebar-title {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .sidebar-menu {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .sidebar-item {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .sidebar-item.active {
+    background-color: #34495e;
+  }
+  
+  .sidebar-item:hover {
+    background-color: #1abc9c;
+  }
+  
+  .main-content {
+    flex-grow: 1;
+    padding: 20px;
+  }
+  
+  .header {
+    margin-bottom: 20px;
+  }
+  
+  .inventory-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .inventory-table th, .inventory-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .inventory-table th {
+    background-color: #2c3e50;
+    color: white;
+  }
+  
+  .low-stock {
+    background-color: #e74c3c;
+    color: white;
+  }
+
+  .inventory-monitoring .movements-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .movements-table th,
+  .movements-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .movements-table th {
+    background-color: #f4f4f4;
+  }
+  
+  .low-stock {
+    background-color: #ffdddd;
+  }
+  
+  .inventory-table input {
+    width: 60px;
+    padding: 4px;
+  }
+  
+  button {
+    margin-left: 5px;
+    padding: 5px 10px;
+  }
+  

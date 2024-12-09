@@ -141,10 +141,11 @@ const productPerformanceData = {
           <img src={kadeText} alt="Logo" className="sidebar-logo" />
         </h2>
         <ul className="sidebar-menu">
-          <li className="sidebar-item">Dashboard</li>
+        
+        <li className="sidebar-item" onClick={() => navigate("/Dashboard")}>Dashboard</li>
           <li className="sidebar-item">Product Management</li>
-          <li className="sidebar-item">Sales Management</li>
-          <li className="sidebar-item">Inventory Monitoring</li>
+          <li className="sidebar-item" onClick={() => navigate("/SalesTracking")}>Sales Management</li>
+          <li className="sidebar-item" onClick={() => navigate("/inventoryMonitoring")}>Inventory Monitoring</li>
           <li className="sidebar-item">Supplier Management</li>
           <li className="sidebar-item">Reorder Management</li>
           <li className="sidebar-item">User Management</li>
@@ -173,7 +174,8 @@ const productPerformanceData = {
                 <input type="file" accept="image/*" onChange={handleProfileUpload} />
               </label>
             )}
-            <span>{user.name}</span>
+            <br></br>
+            <span>({user.username})</span>
             <span>({user.email})</span>
           </div>
         </header>
@@ -211,6 +213,7 @@ const productPerformanceData = {
             <h3>Product Performance</h3>
             <Pie data={productPerformanceData} options={{ responsive: true }} />
           </div>
+            
         </div>
       </main>
     </div>

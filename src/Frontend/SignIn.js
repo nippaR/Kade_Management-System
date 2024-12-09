@@ -13,7 +13,7 @@ const SignIn = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const response = await fetch("http://localhost:5000/api/users/signin", {
         method: "POST",
@@ -21,16 +21,21 @@ const SignIn = () => {
         body: JSON.stringify(formData),
       });
       const data = await response.json();
+  
       if (!response.ok) throw new Error(data.message);
+  
+      console.log("Sign-In Successful: ", data); // Debugging log
+  
       alert("Sign-In Successful! Redirecting to Dashboard...");
       navigate("/dashboard", {
-        state: { user: { name: data.name, email: data.email, profilePicture: data.profilePicture } },
+        state: { user: { username: data.name, email: data.email, profilePicture: data.profilePicture } },
       });
     } catch (err) {
+      console.error("Error during sign-in: ", err.message); // Debugging log
       setError(err.message);
     }
   };
-
+  
   return (
     <div className="auth-page">
       <h1 className="auth-title">Kade.LK Management System</h1>
