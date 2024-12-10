@@ -1,96 +1,128 @@
-.inventory-monitoring {
-    display: flex;
-  }
-  
-  .sidebar {
-    width: 250px;
-    background-color: #2c3e50;
-    color: #ecf0f1;
-    padding: 15px;
-    height: 100vh;
-  }
-  
-  .sidebar-title {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .sidebar-menu {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .sidebar-item {
-    padding: 10px;
-    cursor: pointer;
-  }
-  
-  .sidebar-item.active {
-    background-color: #34495e;
-  }
-  
-  .sidebar-item:hover {
-    background-color: #1abc9c;
-  }
-  
-  .main-content {
-    flex-grow: 1;
-    padding: 20px;
-  }
-  
-  .header {
-    margin-bottom: 20px;
-  }
-  
-  .inventory-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .inventory-table th, .inventory-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-  }
-  
-  .inventory-table th {
-    background-color: #2c3e50;
-    color: white;
-  }
-  
-  .low-stock {
-    background-color: #e74c3c;
-    color: white;
-  }
+/* InventoryMonitoring.css */
 
-  .inventory-monitoring .movements-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-  }
-  
-  .movements-table th,
-  .movements-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-  }
-  
-  .movements-table th {
-    background-color: #f4f4f4;
-  }
-  
-  .low-stock {
-    background-color: #ffdddd;
-  }
-  
-  .inventory-table input {
-    width: 60px;
-    padding: 4px;
-  }
-  
-  button {
-    margin-left: 5px;
-    padding: 5px 10px;
-  }
-  
+.inventory-monitoring-container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  padding: 20px;
+}
+
+.sidebar-title .sidebar-logo {
+  width: 100px; /* Adjust width to fit your design */
+  height: 100px; /* Adjust height for a square logo */
+  margin-right: 10px; /* Space between logo and text */
+  border-radius: 10%; /* Optional, if you want a circular logo */
+}
+
+.sidebar h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  margin: 15px 0;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.sidebar ul li:hover {
+  color: #1abc9c;
+}
+
+.sidebar ul li.logout {
+  margin-top: 30px;
+  color: #e74c3c;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+  background-color: #f4f4f4;
+  overflow-y: auto;
+}
+
+.form-section {
+  background: #fff;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+h1,
+h2 {
+  color: #34495e;
+}
+
+form label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+form input,
+form select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+button {
+  background-color: #1abc9c;
+  color: #fff;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #16a085;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table th,
+table td {
+  text-align: left;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+table th {
+  background-color: #34495e;
+  color: #fff;
+}
+
+.low-stock {
+  background-color: #f8d7da;
+}
+
+.search-bar {
+  margin-bottom: 20px;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+button {
+  margin-top: 10px;
+}

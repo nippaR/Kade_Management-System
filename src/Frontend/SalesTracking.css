@@ -102,3 +102,12 @@ table th {
   background-color: #34495e;
   color: #fff;
 }
+
+.search-bar {
+  margin-bottom: 20px;
+}
+
+button {
+  margin-top: 10px;
+}
+

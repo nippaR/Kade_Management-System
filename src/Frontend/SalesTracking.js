@@ -1,34 +1,49 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 import "./SalesTracking.css";
 import kadeText from "../images/kade2.png"; // Logo image
 import { useNavigate } from "react-router-dom";
 
 const SalesTracking = () => {
   const [sales, setSales] = useState([]);
-  const [inventory, setInventory] = useState([
-    { productId: 1, name: "Maliban Biscut", stock: 50, price: 100 },
-    { productId: 2, name: "Signal Teeth Past", stock: 30, price: 210 },
-    { productId: 3, name: "Samahan", stock: 220, price: 50 },
-    { productId: 4, name: "Lux Sope", stock: 220, price: 110 },
-    { productId: 5, name: "Gal Arrack", stock: 120, price: 3800 },
-    { productId: 6, name: "Jack Daniel", stock: 220, price: 6050 },
-  ]);
+  const [inventory, setInventory] = useState([]);
   const [formData, setFormData] = useState({
     productId: "",
     quantity: "",
     discount: 0,
   });
+  const [searchTerm, setSearchTerm] = useState("");
   const [summary, setSummary] = useState({ daily: 0, weekly: 0, monthly: 0 });
-
   const navigate = useNavigate();
 
-  const handleSignOut = () => navigate("/SignIn");
+  // Fetch inventory and sales data from the backend
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const inventoryRes = await axios.get("http://localhost:5000/inventory");
+        const salesRes = await axios.get("http://localhost:5000/sales");
+        setInventory(inventoryRes.data.inventory || []);
+        setSales(salesRes.data.sales || []);
+      } catch (err) {
+        console.error("Error fetching data:", err.message);
+        alert("Error fetching data. Please check the server.");
+      }
+    };
+    fetchData();
+  }, []);
+
+  // Filtered inventory based on search term
+  const filteredInventory = inventory.filter((item) =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleAddSale = () => {
+  const handleAddSale = async () => {
     const { productId, quantity, discount } = formData;
 
     if (!productId || !quantity || quantity <= 0) {
@@ -36,67 +51,40 @@ const SalesTracking = () => {
       return;
     }
 
-    const product = inventory.find((item) => item.productId === parseInt(productId));
-    if (!product) {
-      alert("Product not found.");
-      return;
+    try {
+      const response = await axios.post("http://localhost:5000/sales", {
+        productId: parseInt(productId),
+        quantity: parseInt(quantity),
+        discount: parseFloat(discount),
+      });
+      alert("Sale added successfully!");
+      setSales([...sales, response.data.sale]);
+      setInventory(response.data.updatedInventory);
+      setFormData({ productId: "", quantity: "", discount: 0 });
+    } catch (err) {
+      console.error("Error adding sale:", err.message);
+      alert(err.response?.data?.error || "An error occurred while adding the sale.");
     }
-
-    if (quantity > product.stock) {
-      alert("Insufficient stock available.");
-      return;
-    }
-
-    const totalPrice = product.price * quantity - discount;
-
-    const newSale = {
-      productId: parseInt(productId),
-      productName: product.name,
-      quantity: parseInt(quantity),
-      date: new Date().toISOString(),
-      totalPrice,
-    };
-
-    setSales((prevSales) => [...prevSales, newSale]);
-
-    setInventory((prevInventory) =>
-      prevInventory.map((item) =>
-        item.productId === parseInt(productId)
-          ? { ...item, stock: item.stock - quantity }
-          : item
-      )
-    );
-
-    setFormData({ productId: "", quantity: "", discount: 0 });
-    alert("Sale recorded successfully!");
   };
 
-  const calculateSummary = useCallback(() => {
-    const now = new Date();
-    const dailySales = sales.filter(
-      (sale) => new Date(sale.date).toDateString() === now.toDateString()
-    );
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text("Sales Report", 14, 22);
 
-    const startOfWeek = new Date();
-    startOfWeek.setDate(now.getDate() - now.getDay()); // Set to the start of the week
-    const weeklySales = sales.filter(
-      (sale) => new Date(sale.date) >= startOfWeek
-    );
-
-    const monthlySales = sales.filter(
-      (sale) => new Date(sale.date).getMonth() === now.getMonth()
-    );
-
-    setSummary({
-      daily: dailySales.reduce((acc, sale) => acc + sale.totalPrice, 0),
-      weekly: weeklySales.reduce((acc, sale) => acc + sale.totalPrice, 0),
-      monthly: monthlySales.reduce((acc, sale) => acc + sale.totalPrice, 0),
+    doc.autoTable({
+      startY: 30,
+      head: [["Product", "Quantity", "Total Price (Rs.)", "Date"]],
+      body: sales.map((sale) => [
+        sale.productName,
+        sale.quantity,
+        sale.totalPrice ? sale.totalPrice.toFixed(2) : "0.00",
+        sale.date ? new Date(sale.date).toLocaleString() : "N/A",
+      ]),
     });
-  }, [sales]);
 
-  useEffect(() => {
-    calculateSummary();
-  }, [sales, calculateSummary]);
+    doc.save("sales-report.pdf");
+  };
 
   return (
     <div className="sales-tracking-container">
@@ -119,17 +107,25 @@ const SalesTracking = () => {
           <li className="sidebar-item">Reorder Management</li>
           <li className="sidebar-item">User Management</li>
           <li className="sidebar-item">Reporting and Analytics</li>
-          <li className="sidebar-item logout" onClick={handleSignOut}>
+          <li className="sidebar-item logout" onClick={() => navigate("/SignIn")}>
             Sign Out
           </li>
         </ul>
       </div>
       <div className="main-content">
         <h1>Sales Tracking</h1>
-
         <div className="form-section">
           <h2>Add Sale</h2>
           <form>
+            <label>
+              Search Product:
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search product..."
+              />
+            </label>
             <label>
               Product:
               <select
@@ -138,7 +134,7 @@ const SalesTracking = () => {
                 onChange={handleInputChange}
               >
                 <option value="">Select a product</option>
-                {inventory.map((product) => (
+                {filteredInventory.map((product) => (
                   <option key={product.productId} value={product.productId}>
                     {product.name} (Stock: {product.stock})
                   </option>
@@ -168,14 +164,12 @@ const SalesTracking = () => {
             </button>
           </form>
         </div>
-
         <div className="summary-section">
           <h2>Sales Summary</h2>
-          <p>Daily Sales: Rs. {summary.daily.toFixed(2)}</p>
-          <p>Weekly Sales: Rs. {summary.weekly.toFixed(2)}</p>
-          <p>Monthly Sales: Rs. {summary.monthly.toFixed(2)}</p>
+          <p>Daily Sales: Rs. {summary.daily ? summary.daily.toFixed(2) : "0.00"}</p>
+          <p>Weekly Sales: Rs. {summary.weekly ? summary.weekly.toFixed(2) : "0.00"}</p>
+          <p>Monthly Sales: Rs. {summary.monthly ? summary.monthly.toFixed(2) : "0.00"}</p>
         </div>
-
         <div className="sales-list">
           <h2>Recent Sales</h2>
           <table>
@@ -192,12 +186,13 @@ const SalesTracking = () => {
                 <tr key={index}>
                   <td>{sale.productName}</td>
                   <td>{sale.quantity}</td>
-                  <td>Rs. {sale.totalPrice.toFixed(2)}</td>
-                  <td>{new Date(sale.date).toLocaleString()}</td>
+                  <td>Rs. {sale.totalPrice ? sale.totalPrice.toFixed(2) : "0.00"}</td>
+                  <td>{sale.date ? new Date(sale.date).toLocaleString() : "N/A"}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          <button onClick={generatePDF}>Generate PDF</button>
         </div>
       </div>
     </div>

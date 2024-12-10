@@ -1,139 +1,218 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./InventoryMonitoring.css";
 import kadeText from "../images/kade2.png"; // Logo image
+import { useNavigate } from "react-router-dom";
 
 const InventoryMonitoring = () => {
-  const navigate = useNavigate();
   const [inventory, setInventory] = useState([]);
-  const [reorderLevels, setReorderLevels] = useState({});
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const [stockMovements, setStockMovements] = useState([]);
+  const [reorderLevels, setReorderLevels] = useState({});
+  const [selectedProduct, setSelectedProduct] = useState("");
+  const [newReorderLevel, setNewReorderLevel] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredInventory, setFilteredInventory] = useState([]);
 
+  const navigate = useNavigate();
+
+  // Fetch inventory and stock movements data from the backend
   useEffect(() => {
-    fetchInventory();
+    const fetchData = async () => {
+      try {
+        const inventoryRes = await axios.get("http://localhost:5000/inventory");
+        const stockMovementsRes = await axios.get("http://localhost:5000/stock-movements");
+        setInventory(inventoryRes.data.inventory);
+        setStockMovements(stockMovementsRes.data.stockMovements);
+        // Initialize reorder levels
+        const initialReorderLevels = {};
+        inventoryRes.data.inventory.forEach((item) => {
+          initialReorderLevels[item.productId] = item.reorderLevel || 10; // Default reorder level
+        });
+        setReorderLevels(initialReorderLevels);
+        setFilteredInventory(inventoryRes.data.inventory);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+
+    // Optional: Set up polling for real-time updates every 30 seconds
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchInventory = async () => {
-    try {
-      const response = await axios.get("http://localhost:5000/api/inventory");
-      setInventory(response.data);
-    } catch (error) {
-      console.error("Error fetching inventory:", error);
-      alert("Failed to fetch inventory data.");
-    }
+  // Update filtered inventory when search term changes
+  useEffect(() => {
+    const filtered = inventory.filter((item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredInventory(filtered);
+  }, [searchTerm, inventory]);
+
+  const handleReorderLevelChange = (e) => {
+    setNewReorderLevel(e.target.value);
   };
 
-  const fetchStockMovements = async (productId) => {
-    try {
-      const response = await axios.get(`http://localhost:5000/api/inventory/${productId}/movements`);
-      setStockMovements(response.data);
-      setSelectedProduct(productId);
-    } catch (error) {
-      console.error("Error fetching stock movements:", error);
-      alert("Failed to fetch stock movements.");
-    }
+  const handleProductSelect = (e) => {
+    setSelectedProduct(e.target.value);
   };
 
-  const updateReorderLevel = async (productId, level) => {
+  const handleSetReorderLevel = async (e) => {
+    e.preventDefault();
+    if (!selectedProduct || !newReorderLevel || newReorderLevel <= 0) {
+      alert("Please select a product and enter a valid reorder level.");
+      return;
+    }
+
     try {
-      await axios.put(`http://localhost:5000/api/inventory/${productId}/reorder-level`, { reorderLevel: level });
+      const response = await axios.put(`http://localhost:5000/inventory/${selectedProduct}/reorder-level`, {
+        reorderLevel: parseInt(newReorderLevel),
+      });
       alert("Reorder level updated successfully!");
-      fetchInventory();
+
+      // Update the inventory and reorder levels in state
+      const updatedInventory = response.data.updatedInventory;
+      setInventory(updatedInventory);
+      setFilteredInventory(updatedInventory);
+      setReorderLevels({
+        ...reorderLevels,
+        [selectedProduct]: parseInt(newReorderLevel),
+      });
+      setSelectedProduct("");
+      setNewReorderLevel("");
     } catch (error) {
-      console.error("Error updating reorder level:", error);
-      alert("Failed to update reorder level.");
+      alert(error.response?.data?.error || "An error occurred while updating reorder level.");
     }
   };
-
-  const handleSignOut = () => navigate("/SignIn");
 
   return (
-    <div className="inventory-monitoring">
-      <aside className="sidebar">
+    <div className="inventory-monitoring-container">
+      <div className="sidebar">
         <h2 className="sidebar-title">
           <img src={kadeText} alt="Logo" className="sidebar-logo" />
         </h2>
-        <ul className="sidebar-menu">
-          <li className="sidebar-item" onClick={() => navigate("/dashboard")}>Dashboard</li>
-          <li className="sidebar-item">Product Management</li>
-          <li className="sidebar-item" onClick={() => navigate("/SalesTracking")}>Sales Management</li>
-          <li className="active">Inventory Monitoring</li>
-          <li className="sidebar-item">Supplier Management</li>
-          <li className="sidebar-item">Reorder Management</li>
-          <li className="sidebar-item">User Management</li>
-          <li className="sidebar-item">Reporting and Analytics</li>
-          <li className="sidebar-item logout" onClick={handleSignOut}>Sign Out</li>
+        <ul>
+          <li className="sidebar-item" onClick={() => navigate("/Dashboard")}>
+            Dashboard
+          </li>
+          <li className="sidebar-item" onClick={() => navigate("/ProductManagement")}>
+            Product Management
+          </li>
+          <li className="sidebar-item" onClick={() => navigate("/SalesTracking")}>
+            Sales Management
+          </li>
+          <li className="sidebar-item" onClick={() => navigate("/InventoryMonitoring")}>
+            Inventory Monitoring
+          </li>
+          <li className="sidebar-item" onClick={() => navigate("/SupplierManagement")}>
+            Supplier Management
+          </li>
+          <li className="sidebar-item" onClick={() => navigate("/ReorderManagement")}>
+            Reorder Management
+          </li>
+          <li className="sidebar-item" onClick={() => navigate("/UserManagement")}>
+            User Management
+          </li>
+          <li className="sidebar-item" onClick={() => navigate("/ReportingAnalytics")}>
+            Reporting and Analytics
+          </li>
+          <li className="sidebar-item logout" onClick={() => navigate("/SignIn")}>
+            Sign Out
+          </li>
         </ul>
-      </aside>
-      <main className="main-content">
-        <header className="header">
-          <h1>Inventory Monitoring</h1>
-        </header>
-        <table className="inventory-table">
-          <thead>
-            <tr>
-              <th>Product Name</th>
-              <th>Stock Level</th>
-              <th>Reorder Level</th>
-              <th>Low Stock Alert</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {inventory.map((item) => (
-              <tr key={item.id} className={item.stock < item.reorderLevel ? "low-stock" : ""}>
-                <td>{item.name}</td>
-                <td>{item.stock}</td>
-                <td>{item.reorderLevel}</td>
-                <td>{item.stock < item.reorderLevel ? "Yes" : "No"}</td>
-                <td>
-                  <input
-                    type="number"
-                    value={reorderLevels[item.id] || item.reorderLevel}
-                    onChange={(e) =>
-                      setReorderLevels({ ...reorderLevels, [item.id]: e.target.value })
-                    }
-                  />
-                  <button
-                    onClick={() => updateReorderLevel(item.id, reorderLevels[item.id] || item.reorderLevel)}
-                  >
-                    Update
-                  </button>
-                  <button onClick={() => fetchStockMovements(item.id)}>View Movements</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      </div>
+      <div className="main-content">
+        <h1>Inventory Dashboard</h1>
 
-        {selectedProduct && (
-          <div className="stock-movements">
-            <h2>Stock Movements for Product ID: {selectedProduct}</h2>
-            <table className="movements-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Type</th>
-                  <th>Quantity</th>
-                  <th>Note</th>
-                </tr>
-              </thead>
-              <tbody>
-                {stockMovements.map((movement) => (
-                  <tr key={movement.id}>
-                    <td>{movement.date}</td>
-                    <td>{movement.type}</td>
-                    <td>{movement.quantity}</td>
-                    <td>{movement.note}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {/* Current Stock Levels */}
+        <div className="form-section">
+          <h2>Current Stock Levels</h2>
+          <div className="search-bar">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search product..."
+            />
           </div>
-        )}
-      </main>
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Stock</th>
+                <th>Reorder Level</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredInventory.map((product) => (
+                <tr
+                  key={product.productId}
+                  className={
+                    product.stock < reorderLevels[product.productId] ? "low-stock" : ""
+                  }
+                >
+                  <td>{product.name}</td>
+                  <td>{product.stock}</td>
+                  <td>{reorderLevels[product.productId]}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Stock Movements */}
+        <div className="form-section">
+          <h2>Stock Movements</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Movement Type</th>
+                <th>Quantity</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stockMovements.map((movement, index) => (
+                <tr key={index}>
+                  <td>{movement.productName}</td>
+                  <td>{movement.type}</td>
+                  <td>{movement.quantity}</td>
+                  <td>{new Date(movement.date).toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Set Reorder Levels */}
+        <div className="form-section">
+          <h2>Set Reorder Level</h2>
+          <form onSubmit={handleSetReorderLevel}>
+            <label>
+              Select Product:
+              <select value={selectedProduct} onChange={handleProductSelect}>
+                <option value="">Select a product</option>
+                {inventory.map((product) => (
+                  <option key={product.productId} value={product.productId}>
+                    {product.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              New Reorder Level:
+              <input
+                type="number"
+                value={newReorderLevel}
+                onChange={handleReorderLevelChange}
+                placeholder="Enter reorder level..."
+              />
+            </label>
+            <button type="submit">Update Reorder Level</button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };
