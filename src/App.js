@@ -10,6 +10,7 @@ import Dashboard from "./Frontend/Dashboard";
 import SalesTracking from "./Frontend/SalesTracking";
 import InventoryMonitoring from "./Frontend/InventoryMonitoring"; // Import InventoryMonitoring page
 import Report from "./Frontend/Reports & Analytics/Reportpage"; // Import Report page
+import ProductManagement from "./Frontend/ProductManagement";
 
 
 const App = () => {
@@ -27,6 +28,7 @@ const App = () => {
         <Route path="/dashboard" element={<Dashboard user={user} />} />
         <Route path="/salestracking" element={<SalesTracking />} />
         <Route path="/inventorymonitoring" element={<InventoryMonitoring />} /> {/* Add route for InventoryMonitoring */}
+        <Route path="/ProductManagement" element={<ProductManagement />} />
         <Route path="/report" element={<Report/>} />
       </Routes>
     </Router>

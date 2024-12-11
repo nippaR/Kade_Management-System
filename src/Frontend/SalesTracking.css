@@ -1,6 +1,6 @@
 .sales-tracking-container {
   display: flex;
-  height: 100vh;
+  height: 117vh;
 }
 
 .sidebar {
@@ -104,7 +104,7 @@ table th {
 }
 
 .search-bar {
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
 button {

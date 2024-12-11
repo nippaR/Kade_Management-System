@@ -16,16 +16,16 @@ const SalesTracking = () => {
   });
   const [searchTerm, setSearchTerm] = useState("");
   const [summary, setSummary] = useState({ daily: 0, weekly: 0, monthly: 0 });
+  const [selectedProductPrice, setSelectedProductPrice] = useState(0); // Track selected product price
   const navigate = useNavigate();
 
-  // Fetch inventory and sales data from the backend
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const inventoryRes = await axios.get("http://localhost:5000/inventory");
-        const salesRes = await axios.get("http://localhost:5000/sales");
-        setInventory(inventoryRes.data.inventory || []);
-        setSales(salesRes.data.sales || []);
+        const inventoryRes = await axios.get("http://localhost:5000/products");
+        const salesRes = await axios.get("http://localhost:5000/stock-movements");
+        setInventory(inventoryRes.data.products || []);
+        setSales(salesRes.data.stockMovements || []);
       } catch (err) {
         console.error("Error fetching data:", err.message);
         alert("Error fetching data. Please check the server.");
@@ -34,33 +34,44 @@ const SalesTracking = () => {
     fetchData();
   }, []);
 
-  // Filtered inventory based on search term
+  useEffect(() => {
+    if (!Array.isArray(sales)) return;
+    const summaryData = {
+      totalSales: sales.reduce((acc, sale) => acc + (sale.totalPrice || 0), 0),
+      totalQuantity: sales.reduce((acc, sale) => acc + (sale.quantity || 0), 0),
+    };
+    setSummary(summaryData);
+  }, [sales]);
+
   const filteredInventory = inventory.filter((item) =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (e.target.name === "productId") {
+      const selectedProduct = inventory.find((p) => p.productId === parseInt(e.target.value));
+      setSelectedProductPrice(selectedProduct ? selectedProduct.price : 0);
+    }
   };
 
   const handleAddSale = async () => {
     const { productId, quantity, discount } = formData;
-
     if (!productId || !quantity || quantity <= 0) {
       alert("Please enter a valid product and quantity.");
       return;
     }
-
     try {
-      const response = await axios.post("http://localhost:5000/sales", {
+      const response = await axios.post("http://localhost:5000/stock-movements", {
         productId: parseInt(productId),
+        type: "sale",
         quantity: parseInt(quantity),
-        discount: parseFloat(discount),
       });
-      alert("Sale added successfully!");
-      setSales([...sales, response.data.sale]);
+      const newSale = response.data.newMovement || {};
+      setSales([...sales, newSale]);
       setInventory(response.data.updatedInventory);
       setFormData({ productId: "", quantity: "", discount: 0 });
+      alert("Sale added successfully!");
     } catch (err) {
       console.error("Error adding sale:", err.message);
       alert(err.response?.data?.error || "An error occurred while adding the sale.");
@@ -71,18 +82,16 @@ const SalesTracking = () => {
     const doc = new jsPDF();
     doc.setFontSize(18);
     doc.text("Sales Report", 14, 22);
-
     doc.autoTable({
       startY: 30,
       head: [["Product", "Quantity", "Total Price (Rs.)", "Date"]],
       body: sales.map((sale) => [
-        sale.productName,
-        sale.quantity,
+        sale.productName || "N/A",
+        sale.quantity || "N/A",
         sale.totalPrice ? sale.totalPrice.toFixed(2) : "0.00",
         sale.date ? new Date(sale.date).toLocaleString() : "N/A",
       ]),
     });
-
     doc.save("sales-report.pdf");
   };
 
@@ -93,25 +102,18 @@ const SalesTracking = () => {
           <img src={kadeText} alt="Logo" className="sidebar-logo" />
         </h2>
         <ul>
-          <li className="sidebar-item" onClick={() => navigate("/Dashboard")}>
-            Dashboard
-          </li>
-          <li className="sidebar-item">Product Management</li>
-          <li className="sidebar-item" onClick={() => navigate("/SalesTracking")}>
-            Sales Management
-          </li>
-          <li className="sidebar-item" onClick={() => navigate("/inventoryMonitoring")}>
-            Inventory Monitoring
-          </li>
+          <li className="sidebar-item" onClick={() => navigate("/Dashboard")}>Dashboard</li>
+          <li className="sidebar-item" onClick={() => navigate("/ProductManagement")}>Product Management</li>
+          <li className="sidebar-item" onClick={() => navigate("/SalesTracking")}>Sales Management</li>
+          <li className="sidebar-item" onClick={() => navigate("/inventoryMonitoring")}>Inventory Monitoring</li>
           <li className="sidebar-item">Supplier Management</li>
           <li className="sidebar-item">Reorder Management</li>
           <li className="sidebar-item">User Management</li>
           <li className="sidebar-item">Reporting and Analytics</li>
-          <li className="sidebar-item logout" onClick={() => navigate("/SignIn")}>
-            Sign Out
-          </li>
+          <li className="sidebar-item logout" onClick={() => navigate("/SignIn")}>Sign Out</li>
         </ul>
       </div>
+
       <div className="main-content">
         <h1>Sales Tracking</h1>
         <div className="form-section">
@@ -142,6 +144,14 @@ const SalesTracking = () => {
               </select>
             </label>
             <label>
+              Price (Rs.):
+              <input
+                type="text"
+                value={selectedProductPrice ? `Rs. ${selectedProductPrice.toFixed(2)}` : "N/A"}
+                disabled
+              />
+            </label>
+            <label>
               Quantity:
               <input
                 type="number"
@@ -159,17 +169,17 @@ const SalesTracking = () => {
                 onChange={handleInputChange}
               />
             </label>
-            <button type="button" onClick={handleAddSale}>
-              Add Sale
-            </button>
+            <button type="button" onClick={handleAddSale}>Add Sale</button>
           </form>
         </div>
+
         <div className="summary-section">
           <h2>Sales Summary</h2>
           <p>Daily Sales: Rs. {summary.daily ? summary.daily.toFixed(2) : "0.00"}</p>
           <p>Weekly Sales: Rs. {summary.weekly ? summary.weekly.toFixed(2) : "0.00"}</p>
           <p>Monthly Sales: Rs. {summary.monthly ? summary.monthly.toFixed(2) : "0.00"}</p>
         </div>
+
         <div className="sales-list">
           <h2>Recent Sales</h2>
           <table>
@@ -184,10 +194,10 @@ const SalesTracking = () => {
             <tbody>
               {sales.map((sale, index) => (
                 <tr key={index}>
-                  <td>{sale.productName}</td>
-                  <td>{sale.quantity}</td>
-                  <td>Rs. {sale.totalPrice ? sale.totalPrice.toFixed(2) : "0.00"}</td>
-                  <td>{sale.date ? new Date(sale.date).toLocaleString() : "N/A"}</td>
+                  <td>{sale?.productName || "N/A"}</td>
+                  <td>{sale?.quantity || "N/A"}</td>
+                  <td>Rs. {sale?.totalPrice ? sale.totalPrice.toFixed(2) : "0.00"}</td>
+                  <td>{sale?.date ? new Date(sale.date).toLocaleString() : "N/A"}</td>
                 </tr>
               ))}
             </tbody>

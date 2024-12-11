@@ -1,6 +1,6 @@
 import { Box, Grid, Stack, Typography } from "@mui/material";
 import React from "react";
-import { Button, Typography } from '@mui/material';
+
 
 
 import bgImage from "../../images/kade2.png";

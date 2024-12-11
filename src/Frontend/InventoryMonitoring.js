@@ -19,17 +19,18 @@ const InventoryMonitoring = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const inventoryRes = await axios.get("http://localhost:5000/inventory");
+        const inventoryRes = await axios.get("http://localhost:5000/products");
         const stockMovementsRes = await axios.get("http://localhost:5000/stock-movements");
-        setInventory(inventoryRes.data.inventory);
+        setInventory(inventoryRes.data.products);
         setStockMovements(stockMovementsRes.data.stockMovements);
+
         // Initialize reorder levels
         const initialReorderLevels = {};
-        inventoryRes.data.inventory.forEach((item) => {
+        inventoryRes.data.products.forEach((item) => {
           initialReorderLevels[item.productId] = item.reorderLevel || 10; // Default reorder level
         });
         setReorderLevels(initialReorderLevels);
-        setFilteredInventory(inventoryRes.data.inventory);
+        setFilteredInventory(inventoryRes.data.products);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -65,15 +66,23 @@ const InventoryMonitoring = () => {
     }
 
     try {
-      const response = await axios.put(`http://localhost:5000/inventory/${selectedProduct}/reorder-level`, {
+      const response = await axios.put(`http://localhost:5000/products/${selectedProduct}`, {
         reorderLevel: parseInt(newReorderLevel),
       });
       alert("Reorder level updated successfully!");
 
       // Update the inventory and reorder levels in state
-      const updatedInventory = response.data.updatedInventory;
-      setInventory(updatedInventory);
-      setFilteredInventory(updatedInventory);
+      const updatedInventory = response.data.product ? [response.data.product] : [];
+      setInventory((prev) =>
+        prev.map((item) =>
+          item.productId === response.data.product.productId ? response.data.product : item
+        )
+      );
+      setFilteredInventory((prev) =>
+        prev.map((item) =>
+          item.productId === response.data.product.productId ? response.data.product : item
+        )
+      );
       setReorderLevels({
         ...reorderLevels,
         [selectedProduct]: parseInt(newReorderLevel),

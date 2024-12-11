@@ -31,11 +31,11 @@ ChartJS.register(
 const Dashboard = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const user = location.state?.user || { name: "formData.username", email: "guest@example.com", profilePicture: null };
+  const user = location.state?.user || { name: "Kade.lk", email: "kadelk@gmail.com", profilePicture: null };
   const [searchQuery, setSearchQuery] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [profilePicture, setProfilePicture] = useState(user.profilePicture);
-
+  
 
   const handleSearch = () => {
     if (!searchQuery.trim()) {
@@ -143,7 +143,7 @@ const productPerformanceData = {
         <ul className="sidebar-menu">
         
         <li className="sidebar-item" onClick={() => navigate("/Dashboard")}>Dashboard</li>
-          <li className="sidebar-item">Product Management</li>
+        <li className="sidebar-item" onClick={() => navigate("/ProductManagement")}>Product Management</li>
           <li className="sidebar-item" onClick={() => navigate("/SalesTracking")}>Sales Management</li>
           <li className="sidebar-item" onClick={() => navigate("/inventoryMonitoring")}>Inventory Monitoring</li>
           <li className="sidebar-item">Supplier Management</li>
@@ -175,8 +175,8 @@ const productPerformanceData = {
               </label>
             )}
             <br></br>
-            <span>({user.username})</span>
-            <span>({user.email})</span>
+            <span>{user.name}</span>
+            <span>{user.email}</span>
           </div>
         </header>
         {/* Rest of the code */}

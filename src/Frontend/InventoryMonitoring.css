@@ -2,13 +2,13 @@
 
 .inventory-monitoring-container {
   display: flex;
-  height: 100vh;
+  height: 117vh;
 }
 
 .sidebar {
   width: 250px;
   background-color: #2c3e50;
-  color: #ecf0f1;
+  color: #060606;
   padding: 20px;
 }
 
@@ -25,7 +25,7 @@
 }
 
 .sidebar ul {
-  list-style: none;
+  list-style:none;
   padding: 0;
 }
 
@@ -36,12 +36,13 @@
 }
 
 .sidebar ul li:hover {
-  color: #1abc9c;
+  color: #f2ea0c;
 }
 
 .sidebar ul li.logout {
   margin-top: 30px;
-  color: #e74c3c;
+  color: #ec4532;
+  
 }
 
 .main-content {

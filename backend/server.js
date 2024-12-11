@@ -1,20 +1,19 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
 const cors = require("cors");
 const { body, validationResult } = require("express-validator");
 const userRoutes = require("./routes/userRoutes");
 
 const app = express();
+
+// Middleware
 app.use(express.json());
 app.use(cors());
 
 // MongoDB URI
-const MONGO_URI =
-  "mongodb+srv://dinushadeshan5:Wije%4020010616@kade-managment-system.7cq6x.mongodb.net/?retryWrites=true&w=majority&appName=Kade-Managment-System&authMechanism=SCRAM-SHA-1";
+const MONGO_URI = "mongodb+srv://dinushadeshan5:Wije%4020010616@kade-managment-system.7cq6x.mongodb.net/?retryWrites=true&w=majority&appName=Kade-Managment-System&authMechanism=SCRAM-SHA-1";
 
+// MongoDB connection
 mongoose
   .connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("MongoDB connected"))
@@ -22,18 +21,19 @@ mongoose
 
 // Models
 const ProductSchema = new mongoose.Schema({
-  productId: Number,
-  name: String,
-  stock: Number,
-  price: Number,
-  reorderLevel: { type: Number, default: 10 }, // Default reorder level
+  productId: { type: Number, unique: true, required: true },
+  name: { type: String, required: true },
+  price: { type: Number, required: true },
+  stock: { type: Number, required: true },
+  reorderLevel: { type: Number, default: 10 },
+  category: { type: String, required: true },
 });
 
 const StockMovementSchema = new mongoose.Schema({
-  productId: Number,
-  productName: String,
-  type: { type: String, enum: ["restock", "sale", "adjustment"] },
-  quantity: Number,
+  productId: { type: Number, required: true },
+  productName: { type: String, required: true },
+  type: { type: String, enum: ["restock", "sale", "adjustment"], required: true },
+  quantity: { type: Number, required: true },
   date: { type: Date, default: Date.now },
 });
 
@@ -43,53 +43,87 @@ const StockMovement = mongoose.model("StockMovement", StockMovementSchema);
 // Routes
 app.use("/api/users", userRoutes);
 
-// Fetch all inventory
-app.get("/inventory", async (req, res) => {
+// Add new product
+app.post(
+  "/products",
+  [
+    body("productId").isInt().withMessage("Product ID must be an integer"),
+    body("name").isString().isLength({ min: 3 }).withMessage("Name must be at least 3 characters long"),
+    body("price").isFloat({ gt: 0 }).withMessage("Price must be a positive number"),
+    body("stock").isInt({ min: 0 }).withMessage("Stock must be a non-negative integer"),
+    body("category").isString().notEmpty().withMessage("Category is required"),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+    const { productId, name, price, stock, reorderLevel, category } = req.body;
+
+    try {
+      const productExists = await Product.findOne({ productId });
+      if (productExists) return res.status(400).json({ error: "Product with this ID already exists." });
+
+      const product = new Product({ productId, name, price, stock, reorderLevel, category });
+      await product.save();
+
+      res.status(201).json({ message: "Product added successfully", product });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to add product." });
+    }
+  }
+);
+
+// Fetch all products
+app.get("/products", async (req, res) => {
   try {
-    const inventory = await Product.find();
-    res.json({ inventory });
+    const products = await Product.find();
+    res.json({ products });
   } catch (error) {
-    res.status(500).json({ error: "Error fetching inventory." });
+    res.status(500).json({ error: "Error fetching products" });
   }
 });
 
-// Fetch stock movements
-app.get("/stock-movements", async (req, res) => {
-  try {
-    const stockMovements = await StockMovement.find().sort({ date: -1 });
-    res.json({ stockMovements });
-  } catch (error) {
-    res.status(500).json({ error: "Error fetching stock movements." });
-  }
-});
-
-// Update reorder level for a product
+// Update product
 app.put(
-  "/inventory/:productId/reorder-level",
-  [body("reorderLevel").isInt({ gt: 0 })],
+  "/products/:productId",
+  [
+    body("name").optional().isString().isLength({ min: 3 }).withMessage("Name must be at least 3 characters long"),
+    body("price").optional().isFloat({ gt: 0 }).withMessage("Price must be a positive number"),
+    body("stock").optional().isInt({ min: 0 }).withMessage("Stock must be a non-negative integer"),
+    body("category").optional().isString().notEmpty().withMessage("Category is required"),
+    body("reorderLevel").optional().isInt({ gt: 0 }).withMessage("Reorder level must be a positive integer"),
+  ],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
     const { productId } = req.params;
-    const { reorderLevel } = req.body;
+    const updates = req.body;
 
     try {
-      const product = await Product.findOne({ productId });
-      if (!product) return res.status(404).json({ error: "Product not found." });
+      const updatedProduct = await Product.findOneAndUpdate({ productId }, updates, { new: true });
+      if (!updatedProduct) return res.status(404).json({ error: "Product not found" });
 
-      product.reorderLevel = reorderLevel;
-      await product.save();
-
-      res.json({
-        message: "Reorder level updated successfully.",
-        updatedInventory: await Product.find(),
-      });
+      res.json({ message: "Product updated successfully", product: updatedProduct });
     } catch (error) {
-      res.status(500).json({ error: "Error updating reorder level." });
+      res.status(500).json({ error: "Error updating product" });
     }
   }
 );
+
+// Delete product
+app.delete("/products/:productId", async (req, res) => {
+  const { productId } = req.params;
+
+  try {
+    const deletedProduct = await Product.findOneAndDelete({ productId });
+    if (!deletedProduct) return res.status(404).json({ error: "Product not found" });
+
+    res.json({ message: "Product deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Error deleting product" });
+  }
+});
 
 // Log stock movements (restock, sale, or adjustment)
 app.post(
@@ -138,13 +172,23 @@ app.post(
   }
 );
 
-// Fetch low-stock alerts
-app.get("/low-stock-alerts", async (req, res) => {
+// Fetch stock movements
+app.get("/stock-movements", async (req, res) => {
   try {
-    const lowStockItems = await Product.find({ $expr: { $lt: ["$stock", "$reorderLevel"] } });
-    res.json({ lowStockItems });
+    const stockMovements = await StockMovement.find().sort({ date: -1 });
+    res.json({ stockMovements });
   } catch (error) {
-    res.status(500).json({ error: "Error fetching low-stock alerts." });
+    res.status(500).json({ error: "Error fetching stock movements." });
+  }
+});
+
+// Fetch low-stock alerts
+app.get("/products/low-stock", async (req, res) => {
+  try {
+    const lowStockProducts = await Product.find({ $expr: { $lt: ["$stock", "$reorderLevel"] } });
+    res.json({ lowStockProducts });
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching low-stock products" });
   }
 });
 

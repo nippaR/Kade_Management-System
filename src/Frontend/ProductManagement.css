@@ -1,0 +1,134 @@
+.product-management {
+    display: flex;
+    height: 117vh;
+  }
+  
+  .sidebar {
+    width: 250px;
+    background-color: #2c3e50;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+  }
+  
+  .sidebar-title {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+  }
+  
+  .sidebar-logo {
+    width: 100px;
+    height: 100px;
+    border-radius: 10%;
+  }
+  
+  .sidebar-menu {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+  }
+  
+  .sidebar-item {
+    padding: 15px;
+    font-size: 1.1em;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .sidebar-item.active,
+  .sidebar-item:hover {
+    background-color: #34495e;
+  }
+  
+  .sidebar-item.logout {
+    margin-top: 20px;
+    background-color: #e74c3c;
+    color: white;
+  }
+  
+  .main-content {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #f5f5f5;
+    overflow-y: auto;
+  }
+  
+  .product-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .product-form input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .product-form button {
+    padding: 10px 15px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .product-form button:hover {
+    background-color: #45a049;
+  }
+  
+  .search-filter {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .search-filter input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .product-list {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .product-item {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .product-item.low-stock {
+    background-color: #fff3cd;
+    border-left: 5px solid #ffc107;
+  }
+  
+  .product-item button {
+    margin-right: 5px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .product-item button:first-child {
+    background-color: #2196f3;
+    color: white;
+  }
+  
+  .product-item button:last-child {
+    background-color: #e74c3c;
+    color: white;
+  }
+  
+  .product-item button:hover {
+    opacity: 0.8;
+  }
+  
