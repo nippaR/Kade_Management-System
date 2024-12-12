@@ -43,15 +43,15 @@ const StockMovement = mongoose.model("StockMovement", StockMovementSchema);
 // Routes
 app.use("/api/users", userRoutes);
 
-// Add new product
+// Product Routes
 app.post(
   "/products",
   [
-    body("productId").isInt().withMessage("Product ID must be an integer"),
-    body("name").isString().isLength({ min: 3 }).withMessage("Name must be at least 3 characters long"),
-    body("price").isFloat({ gt: 0 }).withMessage("Price must be a positive number"),
-    body("stock").isInt({ min: 0 }).withMessage("Stock must be a non-negative integer"),
-    body("category").isString().notEmpty().withMessage("Category is required"),
+    body("productId").isInt(),
+    body("name").isString().isLength({ min: 3 }),
+    body("price").isFloat({ gt: 0 }),
+    body("stock").isInt({ min: 0 }),
+    body("category").isString().notEmpty(),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -73,7 +73,6 @@ app.post(
   }
 );
 
-// Fetch all products
 app.get("/products", async (req, res) => {
   try {
     const products = await Product.find();
@@ -83,15 +82,14 @@ app.get("/products", async (req, res) => {
   }
 });
 
-// Update product
 app.put(
   "/products/:productId",
   [
-    body("name").optional().isString().isLength({ min: 3 }).withMessage("Name must be at least 3 characters long"),
-    body("price").optional().isFloat({ gt: 0 }).withMessage("Price must be a positive number"),
-    body("stock").optional().isInt({ min: 0 }).withMessage("Stock must be a non-negative integer"),
-    body("category").optional().isString().notEmpty().withMessage("Category is required"),
-    body("reorderLevel").optional().isInt({ gt: 0 }).withMessage("Reorder level must be a positive integer"),
+    body("name").optional().isString().isLength({ min: 3 }),
+    body("price").optional().isFloat({ gt: 0 }),
+    body("stock").optional().isInt({ min: 0 }),
+    body("category").optional().isString().notEmpty(),
+    body("reorderLevel").optional().isInt({ gt: 0 }),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -111,7 +109,6 @@ app.put(
   }
 );
 
-// Delete product
 app.delete("/products/:productId", async (req, res) => {
   const { productId } = req.params;
 
@@ -125,7 +122,6 @@ app.delete("/products/:productId", async (req, res) => {
   }
 });
 
-// Log stock movements (restock, sale, or adjustment)
 app.post(
   "/stock-movements",
   [
@@ -147,13 +143,11 @@ app.post(
         return res.status(400).json({ error: "Insufficient stock for sale." });
       }
 
-      // Update stock based on the movement type
       if (type === "restock") product.stock += quantity;
       else if (type === "sale") product.stock -= quantity;
 
       await product.save();
 
-      // Log the stock movement
       const newMovement = new StockMovement({
         productId,
         productName: product.name,
@@ -172,7 +166,6 @@ app.post(
   }
 );
 
-// Fetch stock movements
 app.get("/stock-movements", async (req, res) => {
   try {
     const stockMovements = await StockMovement.find().sort({ date: -1 });
@@ -182,7 +175,6 @@ app.get("/stock-movements", async (req, res) => {
   }
 });
 
-// Fetch low-stock alerts
 app.get("/products/low-stock", async (req, res) => {
   try {
     const lowStockProducts = await Product.find({ $expr: { $lt: ["$stock", "$reorderLevel"] } });
@@ -192,6 +184,52 @@ app.get("/products/low-stock", async (req, res) => {
   }
 });
 
-// Server setup
+app.post("/reorder/process", async (req, res) => {
+  const { reorderList } = req.body;
+
+  if (!Array.isArray(reorderList) || reorderList.length === 0) {
+    return res.status(400).json({ error: "Reorder list is invalid or empty." });
+  }
+
+  try {
+    for (const item of reorderList) {
+      const { productId, reorderQuantity } = item;
+
+      const product = await Product.findOne({ productId });
+      if (!product) return res.status(404).json({ error: `Product with ID ${productId} not found.` });
+
+      product.stock += reorderQuantity;
+      await product.save();
+
+      const stockMovement = new StockMovement({
+        productId,
+        productName: product.name,
+        type: "restock",
+        quantity: reorderQuantity,
+      });
+      await stockMovement.save();
+    }
+
+    res.json({ message: "Reorder processed successfully." });
+  } catch (error) {
+    res.status(500).json({ error: "Error processing reorder." });
+  }
+});
+
+app.post("/notify-suppliers", async (req, res) => {
+  const { reorderList } = req.body;
+
+  if (!Array.isArray(reorderList) || reorderList.length === 0) {
+    return res.status(400).json({ error: "Reorder list is invalid or empty." });
+  }
+
+  try {
+    console.log("Notifying suppliers about reorder items:", reorderList);
+    res.json({ message: "Suppliers notified successfully." });
+  } catch (error) {
+    res.status(500).json({ error: "Error notifying suppliers." });
+  }
+});
+
 const PORT = 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

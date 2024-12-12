@@ -3,9 +3,12 @@ import { useNavigate } from "react-router-dom";
 import "./Home.css";
 import animate1 from "../images/animate1.png";
 import kadeText from "../images/kade2.png"; // Import the Sinhala text image
+import demoVideo from "../videos/demo.mp4"; // Import the video file
 
 const Home = () => {
   const navigate = useNavigate(); // Hook for navigation
+
+  
 
   return (
     <div>
@@ -18,6 +21,18 @@ const Home = () => {
             SYSTEM
           </h1>
           <p className="subtitle">For Easy Life</p>
+
+          {/* Video Element */}
+          <div className="video-container">
+            <video
+              src={demoVideo}
+              className="intro-video"
+              controls
+              loop
+              playsInline
+            ></video>
+
+          </div>
         </div>
 
         <div className="image-container">

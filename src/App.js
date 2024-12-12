@@ -11,6 +11,8 @@ import SalesTracking from "./Frontend/SalesTracking";
 import InventoryMonitoring from "./Frontend/InventoryMonitoring"; // Import InventoryMonitoring page
 import Report from "./Frontend/Reports & Analytics/Reportpage"; // Import Report page
 import ProductManagement from "./Frontend/ProductManagement";
+import ReorderManagement from "./Frontend/ReorderManagement";
+
 
 
 const App = () => {
@@ -29,6 +31,7 @@ const App = () => {
         <Route path="/salestracking" element={<SalesTracking />} />
         <Route path="/inventorymonitoring" element={<InventoryMonitoring />} /> {/* Add route for InventoryMonitoring */}
         <Route path="/ProductManagement" element={<ProductManagement />} />
+        <Route path="/ReorderManagement" element={<ReorderManagement />} />
         <Route path="/report" element={<Report/>} />
       </Routes>
     </Router>
