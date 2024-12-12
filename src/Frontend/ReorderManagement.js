@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ReorderManagement.css";
-import kadeText from "../images/kade2.png";
+import kadeText from "../images/kade2.png"; // Logo image
+
 
 const ReorderManagement = () => {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ const ReorderManagement = () => {
     fetchLowStockProducts();
   }, []);
 
+  
   const fetchLowStockProducts = async () => {
     try {
       const response = await fetch("http://localhost:5000/products/low-stock"); // Ensure this URL is correct
@@ -115,6 +117,7 @@ const ReorderManagement = () => {
           <li className="sidebar-item">Reorder Management</li>
           <li className="sidebar-item">User Management</li>
           <li className="sidebar-item">Reporting and Analytics</li>
+          <li className="sidebar-item" onClick={() => navigate("/SystemSettings")}>System Settings</li>
           <li className="sidebar-item logout" onClick={() => navigate("/SignIn")}>
             Sign Out
           </li>

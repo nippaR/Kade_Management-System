@@ -105,6 +105,7 @@ const ProductManagement = () => {
           <li className="sidebar-item" onClick={() => navigate("/ReorderManagement")}>Reorder Management</li>
           <li className="sidebar-item">User Management</li>
           <li className="sidebar-item">Reporting and Analytics</li>
+          <li className="sidebar-item" onClick={() => navigate("/SystemSettings")}>System Settings</li>
           <li className="sidebar-item logout" onClick={() => navigate("/SignIn")}>
             Sign Out
           </li>
@@ -168,7 +169,7 @@ const ProductManagement = () => {
             >
               <p>ID: {product.productId}</p>
               <p>Name: {product.name}</p>
-              <p>Price: ${product.price.toFixed(2)}</p>
+              <p>Price: Rs.{product.price.toFixed(2)}</p>
               <p>Stock: {product.stock}</p>
               <p>Category: {product.category}</p>
               <button onClick={() => handleEditProduct(product.productId)}>Edit</button>

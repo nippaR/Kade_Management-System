@@ -3,6 +3,21 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const { body, validationResult } = require("express-validator");
 const userRoutes = require("./routes/userRoutes");
+const multer = require("multer");
+
+// Configure Multer to store files in the "uploads" folder
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // The directory where files will be stored
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`); // Generate a unique filename
+  },
+});
+
+// Create the Multer middleware
+const upload = multer({ storage });
+
 
 const app = express();
 
@@ -230,6 +245,44 @@ app.post("/notify-suppliers", async (req, res) => {
     res.status(500).json({ error: "Error notifying suppliers." });
   }
 });
+
+// MongoDB Schema
+const SettingsSchema = new mongoose.Schema({
+  shopName: String,
+  logo: String, // Store base64 image string
+  contactInfo: String,
+  taxRate: Number,
+  discount: Number,
+  emailAlerts: Boolean,
+});
+
+const Settings = mongoose.model("Settings", SettingsSchema);
+
+app.use(express.json());
+
+// Save settings
+app.post("/api/settings", async (req, res) => {
+  try {
+    const settings = new Settings(req.body);
+    await Settings.deleteMany(); // Clear existing settings
+    await settings.save();
+    res.status(200).send("Settings saved successfully!");
+  } catch (error) {
+    res.status(500).send("Failed to save settings: " + error.message);
+  }
+});
+
+// Restore backup
+app.post("/api/restore", upload.single("backupFile"), (req, res) => {
+  const backupFile = req.file; // Access the uploaded file
+  if (!backupFile) return res.status(400).send("No file uploaded.");
+
+  // TODO: Add logic to handle the uploaded backup file (e.g., restoring the database)
+  console.log("File uploaded:", backupFile);
+
+  res.status(200).send("Backup restored successfully.");
+});
+
 
 const PORT = 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

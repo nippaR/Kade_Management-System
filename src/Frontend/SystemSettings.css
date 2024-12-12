@@ -1,0 +1,51 @@
+.settings-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .setting-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .setting-item label {
+    font-weight: bold;
+  }
+  
+  .setting-item input,
+  .setting-item textarea {
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .preview {
+    width: 100px;
+    height: auto;
+    margin-top: 10px;
+  }
+  
+  .save-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .save-button:hover {
+    background-color: #45a049;
+  }
+
+  .sidebar-title .sidebar-logo {
+    width: 100px; /* Adjust width to fit your design */
+    height: 100px; /* Adjust height for a square logo */
+    margin-right: 10px; /* Space between logo and text */
+    border-radius: 10%; /* Optional, if you want a circular logo */
+  }

@@ -132,3 +132,13 @@
     opacity: 0.8;
   }
   
+  .low-stock {
+    border: 2px solid red;
+    background-color: #ffe6e6;
+  }
+  
+  .low-stock p {
+    color: red;
+    font-weight: bold;
+  }
+  
