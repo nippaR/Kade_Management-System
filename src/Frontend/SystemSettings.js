@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import "./Dashboard.css"; // Use the same CSS file as Dashboard
 import "./SystemSettings.css";
 import { useEffect } from "react";
+import kadeText from "../images/kade2.png"; // Logo image
+
 
 const SystemSettings = () => {
   const navigate = useNavigate();
@@ -110,7 +112,9 @@ const SystemSettings = () => {
   return (
     <div className="dashboard">
       <aside className="sidebar">
-        <h2 className="sidebar-title">System Settings</h2>
+         <h2 className="sidebar-title">
+                  <img src={kadeText} alt="Logo" className="sidebar-logo" />
+        </h2>
         <ul className="sidebar-menu">
           <li className="sidebar-item" onClick={() => navigate("/Dashboard")}>
             Dashboard

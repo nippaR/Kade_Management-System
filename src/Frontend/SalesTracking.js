@@ -4,6 +4,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import "./SalesTracking.css";
 import kadeText from "../images/kade2.png"; // Logo image
+import kadeText1 from "../images/kade1.png"; // Logo image
 import { useNavigate } from "react-router-dom";
 
 const SalesTracking = () => {
@@ -15,10 +16,11 @@ const SalesTracking = () => {
     discount: 0,
   });
   const [searchTerm, setSearchTerm] = useState("");
-  const [summary, setSummary] = useState({ daily: 0, weekly: 0, monthly: 0 });
+  const [summary, setSummary] = useState({ totalSales: 0, totalQuantity: 0 });
   const [selectedProductPrice, setSelectedProductPrice] = useState(0); // Track selected product price
   const navigate = useNavigate();
 
+  // Fetch data from the backend
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -34,6 +36,7 @@ const SalesTracking = () => {
     fetchData();
   }, []);
 
+  // Update the summary whenever sales change
   useEffect(() => {
     if (!Array.isArray(sales)) return;
     const summaryData = {
@@ -43,10 +46,12 @@ const SalesTracking = () => {
     setSummary(summaryData);
   }, [sales]);
 
+  // Filter inventory based on search term
   const filteredInventory = inventory.filter((item) =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Handle input changes
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (e.target.name === "productId") {
@@ -55,6 +60,7 @@ const SalesTracking = () => {
     }
   };
 
+  // Add a new sale
   const handleAddSale = async () => {
     const { productId, quantity, discount } = formData;
     if (!productId || !quantity || quantity <= 0) {
@@ -78,12 +84,41 @@ const SalesTracking = () => {
     }
   };
 
-  const generatePDF = () => {
+  // Convert image to Base64
+  const getBase64ImageFromURL = async (url) => {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  };
+
+  // Generate PDF
+  const generatePDF = async () => {
     const doc = new jsPDF();
+
+    // Add the logo image to the top-right corner
+    const logoBase64 = await getBase64ImageFromURL(kadeText1);
+    doc.addImage(logoBase64, "PNG", 150, 10, 50, 50); // Adjust x, y, width, height
+
+    // Title for the report
     doc.setFontSize(18);
-    doc.text("Sales Report", 14, 22);
+    doc.text("Sales Report", 14, 20);
+
+    // Add summary section
+    let yPos = 40;
+    doc.setFontSize(14);
+    doc.text(`Total Sales: Rs. ${summary.totalSales.toFixed(2)}`, 14, yPos);
+    yPos += 8;
+    doc.text(`Total Quantity: ${summary.totalQuantity}`, 14, yPos);
+    yPos += 10;
+
+    // Sales table
     doc.autoTable({
-      startY: 30,
+      startY: yPos,
       head: [["Product", "Quantity", "Total Price (Rs.)", "Date"]],
       body: sales.map((sale) => [
         sale.productName || "N/A",
@@ -91,7 +126,11 @@ const SalesTracking = () => {
         sale.totalPrice ? sale.totalPrice.toFixed(2) : "0.00",
         sale.date ? new Date(sale.date).toLocaleString() : "N/A",
       ]),
+      margin: { top: 10 },
+      styles: { fontSize: 10, cellPadding: 3 },
     });
+
+    // Save the PDF
     doc.save("sales-report.pdf");
   };
 
@@ -176,9 +215,8 @@ const SalesTracking = () => {
 
         <div className="summary-section">
           <h2>Sales Summary</h2>
-          <p>Daily Sales: Rs. {summary.daily ? summary.daily.toFixed(2) : "0.00"}</p>
-          <p>Weekly Sales: Rs. {summary.weekly ? summary.weekly.toFixed(2) : "0.00"}</p>
-          <p>Monthly Sales: Rs. {summary.monthly ? summary.monthly.toFixed(2) : "0.00"}</p>
+          <p>Total Sales: Rs. {summary.totalSales ? summary.totalSales.toFixed(2) : "0.00"}</p>
+          <p>Total Quantity: {summary.totalQuantity}</p>
         </div>
 
         <div className="sales-list">
@@ -194,14 +232,15 @@ const SalesTracking = () => {
             </thead>
             <tbody>
               {sales.map((sale, index) => (
-                <tr key={index}>
-                  <td>{sale?.productName || "N/A"}</td>
-                  <td>{sale?.quantity || "N/A"}</td>
-                  <td>Rs. {sale?.totalPrice ? sale.totalPrice.toFixed(2) : "0.00"}</td>
-                  <td>{sale?.date ? new Date(sale.date).toLocaleString() : "N/A"}</td>
+                 <tr key={index}>
+                   <td>{sale.productName || "N/A"}</td>
+                   <td>{sale.quantity || "N/A"}</td>
+                   <td>Rs. {sale.totalPrice ? sale.totalPrice.toFixed(2) : "0.00"}</td>
+                   <td>{sale.date ? new Date(sale.date).toLocaleString() : "N/A"}</td>
                 </tr>
               ))}
             </tbody>
+
           </table>
           <button onClick={generatePDF}>Generate PDF</button>
         </div>

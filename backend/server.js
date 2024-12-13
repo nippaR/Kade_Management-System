@@ -1,9 +1,10 @@
+// Import dependencies
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const { body, validationResult } = require("express-validator");
-const userRoutes = require("./routes/userRoutes");
 const multer = require("multer");
+const userRoutes = require("./routes/userRoutes");
 
 // Configure Multer to store files in the "uploads" folder
 const storage = multer.diskStorage({
@@ -14,10 +15,7 @@ const storage = multer.diskStorage({
     cb(null, `${Date.now()}-${file.originalname}`); // Generate a unique filename
   },
 });
-
-// Create the Multer middleware
 const upload = multer({ storage });
-
 
 const app = express();
 
@@ -49,6 +47,7 @@ const StockMovementSchema = new mongoose.Schema({
   productName: { type: String, required: true },
   type: { type: String, enum: ["restock", "sale", "adjustment"], required: true },
   quantity: { type: Number, required: true },
+  totalPrice: { type: Number },
   date: { type: Date, default: Date.now },
 });
 
@@ -137,6 +136,7 @@ app.delete("/products/:productId", async (req, res) => {
   }
 });
 
+// Stock Movements
 app.post(
   "/stock-movements",
   [
@@ -158,8 +158,13 @@ app.post(
         return res.status(400).json({ error: "Insufficient stock for sale." });
       }
 
-      if (type === "restock") product.stock += quantity;
-      else if (type === "sale") product.stock -= quantity;
+      let totalPrice = 0;
+      if (type === "restock") {
+        product.stock += quantity;
+      } else if (type === "sale") {
+        product.stock -= quantity;
+        totalPrice = product.price * quantity;
+      }
 
       await product.save();
 
@@ -168,6 +173,7 @@ app.post(
         productName: product.name,
         type,
         quantity,
+        totalPrice,
       });
       await newMovement.save();
 
@@ -246,10 +252,10 @@ app.post("/notify-suppliers", async (req, res) => {
   }
 });
 
-// MongoDB Schema
+// Settings
 const SettingsSchema = new mongoose.Schema({
   shopName: String,
-  logo: String, // Store base64 image string
+  logo: String,
   contactInfo: String,
   taxRate: Number,
   discount: Number,
@@ -258,9 +264,6 @@ const SettingsSchema = new mongoose.Schema({
 
 const Settings = mongoose.model("Settings", SettingsSchema);
 
-app.use(express.json());
-
-// Save settings
 app.post("/api/settings", async (req, res) => {
   try {
     const settings = new Settings(req.body);
@@ -272,9 +275,8 @@ app.post("/api/settings", async (req, res) => {
   }
 });
 
-// Restore backup
 app.post("/api/restore", upload.single("backupFile"), (req, res) => {
-  const backupFile = req.file; // Access the uploaded file
+  const backupFile = req.file;
   if (!backupFile) return res.status(400).send("No file uploaded.");
 
   // TODO: Add logic to handle the uploaded backup file (e.g., restoring the database)
@@ -283,6 +285,6 @@ app.post("/api/restore", upload.single("backupFile"), (req, res) => {
   res.status(200).send("Backup restored successfully.");
 });
 
-
+// Start Server
 const PORT = 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
