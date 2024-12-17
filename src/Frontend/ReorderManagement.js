@@ -78,6 +78,7 @@ const ReorderManagement = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ reorderList }),
       });
+  
       if (response.ok) {
         alert("Suppliers notified successfully!");
       } else {
@@ -88,6 +89,7 @@ const ReorderManagement = () => {
       alert("Error notifying suppliers.");
     }
   };
+  
 
   // Toggle Light/Dark Mode
   const toggleDarkMode = () => {

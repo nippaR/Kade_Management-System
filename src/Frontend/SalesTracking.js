@@ -18,6 +18,7 @@ const SalesTracking = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [summary, setSummary] = useState({ totalSales: 0, totalQuantity: 0 });
   const [selectedProductPrice, setSelectedProductPrice] = useState(0); // Track selected product price
+  const [showPopup, setShowPopup] = useState(false); // Popup state
   const navigate = useNavigate();
 
   // Fetch data from the backend
@@ -77,15 +78,21 @@ const SalesTracking = () => {
       setSales([...sales, newSale]);
       setInventory(response.data.updatedInventory);
       setFormData({ productId: "", quantity: "", discount: 0 });
-      alert("Sale added successfully!");
+      setShowPopup(true); // Show popup on success
     } catch (err) {
       console.error("Error adding sale:", err.message);
       alert(err.response?.data?.error || "An error occurred while adding the sale.");
     }
   };
 
-  // Convert image to Base64
-  const getBase64ImageFromURL = async (url) => {
+  // Close popup
+  const closePopup = () => {
+    setShowPopup(false);
+    window.location.reload(); // Refresh the page
+  };
+
+   // Convert image to Base64
+   const getBase64ImageFromURL = async (url) => {
     const response = await fetch(url);
     const blob = await response.blob();
     return new Promise((resolve, reject) => {
@@ -95,6 +102,7 @@ const SalesTracking = () => {
       reader.readAsDataURL(blob);
     });
   };
+
 
   // Generate PDF
   const generatePDF = async () => {
@@ -136,6 +144,16 @@ const SalesTracking = () => {
 
   return (
     <div className="sales-tracking-container">
+      {showPopup && (
+        <div className="popup-overlay">
+          <div className="popup-message">
+            <h2>Sale Added Successfully!</h2>
+            <p>Please refresh the page to see the latest updates.</p>
+            <button onClick={closePopup}>Close</button>
+          </div>
+        </div>
+      )}
+
       <div className="sidebar">
         <h2 className="sidebar-title">
           <img src={kadeText} alt="Logo" className="sidebar-logo" />
@@ -145,7 +163,7 @@ const SalesTracking = () => {
           <li className="sidebar-item" onClick={() => navigate("/ProductManagement")}>Product Management</li>
           <li className="sidebar-item" onClick={() => navigate("/SalesTracking")}>Sales Management</li>
           <li className="sidebar-item" onClick={() => navigate("/inventoryMonitoring")}>Inventory Monitoring</li>
-          <li className="sidebar-item">Supplier Management</li>
+          <li className="sidebar-item" onClick={() => navigate("/SupplierManagement")}>Supplier Management</li>
           <li className="sidebar-item" onClick={() => navigate("/ReorderManagement")}>Reorder Management</li>
           <li className="sidebar-item">User Management</li>
           <li className="sidebar-item">Reporting and Analytics</li>
@@ -232,15 +250,14 @@ const SalesTracking = () => {
             </thead>
             <tbody>
               {sales.map((sale, index) => (
-                 <tr key={index}>
-                   <td>{sale.productName || "N/A"}</td>
-                   <td>{sale.quantity || "N/A"}</td>
-                   <td>Rs. {sale.totalPrice ? sale.totalPrice.toFixed(2) : "0.00"}</td>
-                   <td>{sale.date ? new Date(sale.date).toLocaleString() : "N/A"}</td>
+                <tr key={index}>
+                  <td>{sale.productName || "N/A"}</td>
+                  <td>{sale.quantity || "N/A"}</td>
+                  <td>Rs. {sale.totalPrice ? sale.totalPrice.toFixed(2) : "0.00"}</td>
+                  <td>{sale.date ? new Date(sale.date).toLocaleString() : "N/A"}</td>
                 </tr>
               ))}
             </tbody>
-
           </table>
           <button onClick={generatePDF}>Generate PDF</button>
         </div>

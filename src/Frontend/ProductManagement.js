@@ -101,7 +101,7 @@ const ProductManagement = () => {
           <li className="sidebar-item active">Product Management</li>
           <li className="sidebar-item" onClick={() => navigate("/SalesTracking")}>Sales Management</li>
           <li className="sidebar-item" onClick={() => navigate("/inventoryMonitoring")}>Inventory Monitoring</li>
-          <li className="sidebar-item">Supplier Management</li>
+          <li className="sidebar-item" onClick={() => navigate("/SupplierManagement")}>Supplier Management</li>
           <li className="sidebar-item" onClick={() => navigate("/ReorderManagement")}>Reorder Management</li>
           <li className="sidebar-item">User Management</li>
           <li className="sidebar-item">Reporting and Analytics</li>

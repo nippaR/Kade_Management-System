@@ -5,6 +5,12 @@ const cors = require("cors");
 const { body, validationResult } = require("express-validator");
 const multer = require("multer");
 const userRoutes = require("./routes/userRoutes");
+const supplierRoutes = require("./routes/supplierRoutes");
+const nodemailer = require("nodemailer");
+const path = require("path");
+const fs = require("fs");
+
+
 
 // Configure Multer to store files in the "uploads" folder
 const storage = multer.diskStorage({
@@ -32,6 +38,8 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
+
+
 // Models
 const ProductSchema = new mongoose.Schema({
   productId: { type: Number, unique: true, required: true },
@@ -56,6 +64,8 @@ const StockMovement = mongoose.model("StockMovement", StockMovementSchema);
 
 // Routes
 app.use("/api/users", userRoutes);
+app.use("/api", supplierRoutes); // Make sure this is included and correct
+
 
 // Product Routes
 app.post(
@@ -237,6 +247,8 @@ app.post("/reorder/process", async (req, res) => {
   }
 });
 
+// Load suppliers and send email
+// Supplier Notification Route
 app.post("/notify-suppliers", async (req, res) => {
   const { reorderList } = req.body;
 
@@ -245,9 +257,67 @@ app.post("/notify-suppliers", async (req, res) => {
   }
 
   try {
-    console.log("Notifying suppliers about reorder items:", reorderList);
+    // Fetch suppliers
+    const suppliers = await Supplier.find();
+    if (!suppliers.length) return res.status(404).json({ error: "No suppliers found." });
+
+    // Load logo image safely
+    const logoPath = path.join(__dirname, "images", "kade2.png");
+    if (!fs.existsSync(logoPath)) throw new Error("Logo image not found.");
+    const logoBase64 = fs.readFileSync(logoPath, "base64");
+
+    // Configure email transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "dinushadeshan4@gmail.com",
+        pass: "oqax fsvx gtue mlmb", // Replace with Gmail App Password
+      },
+    });
+
+    // Prepare email content
+    const emailHTML = `
+      <div style="font-family: Arial, sans-serif; padding: 20px; line-height: 1.5;">
+        <img src="data:image/png;base64,${logoBase64}" alt="Logo" style="width: 150px; margin-bottom: 20px;" />
+        <h2>Reorder Notification</h2>
+        <p>Dear Supplier,</p>
+        <p>The following products need to be reordered:</p>
+        <table border="1" cellspacing="0" cellpadding="10" style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background-color: #f2f2f2;">
+              <th>Product Name</th>
+              <th>Reorder Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${reorderList.map(item => `
+              <tr>
+                <td>${item.name}</td>
+                <td>${item.reorderQuantity}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+        <p>Please process this order at your earliest convenience.</p>
+        <p>Thank you.<br><strong>Kade Management Team</strong></p>
+      </div>
+    `;
+
+    // Send emails to all suppliers
+    const emailPromises = suppliers.map(supplier =>
+      transporter.sendMail({
+        from: '"Kade Management" <dinushadeshan4@gmail.com>',
+        to: supplier.email,
+        subject: "Reorder Notification",
+        html: emailHTML,
+      })
+    );
+
+    await Promise.all(emailPromises);
+    console.log("Emails sent to suppliers.");
     res.json({ message: "Suppliers notified successfully." });
   } catch (error) {
+    console.error("Error notifying suppliers:", error.message);
     res.status(500).json({ error: "Error notifying suppliers." });
   }
 });
