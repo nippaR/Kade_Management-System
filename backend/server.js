@@ -9,6 +9,7 @@ const supplierRoutes = require("./routes/supplierRoutes");
 const nodemailer = require("nodemailer");
 const path = require("path");
 const fs = require("fs");
+const { User, ActivityLog } = require("./models/User");
 
 
 

@@ -148,7 +148,7 @@ const productPerformanceData = {
           <li className="sidebar-item" onClick={() => navigate("/inventoryMonitoring")}>Inventory Monitoring</li>
           <li className="sidebar-item" onClick={() => navigate("/SupplierManagement")}>Supplier Management</li>
           <li className="sidebar-item" onClick={() => navigate("/ReorderManagement")}>Reorder Management</li>
-          <li className="sidebar-item">User Management</li>
+          <li className="sidebar-item" onClick={() => navigate("/UserManagement")}>User Management</li>
           <li className="sidebar-item">Reporting and Analytics</li>
           <li className="sidebar-item" onClick={() => navigate("/SystemSettings")}>System Settings</li>
           <li className="sidebar-item logout" onClick={handleSignOut}>

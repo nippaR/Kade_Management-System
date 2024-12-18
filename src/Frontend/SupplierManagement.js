@@ -146,7 +146,7 @@ const handleEdit = (supplier) => {
           >
             Reorder Management
           </li>
-          <li className="sidebar-item">User Management</li>
+          <li className="sidebar-item" onClick={() => navigate("/UserManagement")}>User Management</li>
           <li className="sidebar-item">Reporting and Analytics</li>
           <li
             className="sidebar-item"

@@ -14,6 +14,8 @@ import ProductManagement from "./Frontend/ProductManagement";
 import ReorderManagement from "./Frontend/ReorderManagement";
 import SupplierManagement from "./Frontend/SupplierManagement";
 import SystemSettings from "./Frontend/SystemSettings";
+import UserManagement from "./Frontend/UserManagement";
+
 
 
 
@@ -35,6 +37,7 @@ const App = () => {
         <Route path="/ProductManagement" element={<ProductManagement />} />
         <Route path="/SupplierManagement" element={<SupplierManagement/>} />
         <Route path="/ReorderManagement" element={<ReorderManagement />} />
+        <Route path="/UserManagement" element={<UserManagement />} />
         <Route path="/SystemSettings" element={<SystemSettings/>} />
         <Route path="/report" element={<Report/>} />
       </Routes>
