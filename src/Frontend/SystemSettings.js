@@ -125,7 +125,7 @@ const SystemSettings = () => {
           <li className="sidebar-item">Supplier Management</li>
           <li className="sidebar-item" onClick={() => navigate("/ReorderManagement")}>Reorder Management</li>
           <li className="sidebar-item">User Management</li>
-          <li className="sidebar-item">Reporting and Analytics</li>
+          <li className="sidebar-item" onClick={() => navigate("/ReportingAndAnalytics")}>Reporting And Analytics</li>
           <li className="sidebar-item">System Settings</li>
           <li className="sidebar-item logout" onClick={handleSignOut}>
             Sign Out

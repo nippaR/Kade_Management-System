@@ -1,37 +1,51 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Select from "react-select"; // Install react-select
 import "./ReorderManagement.css";
 import kadeText from "../images/kade2.png"; // Logo image
-
 
 const ReorderManagement = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [reorderList, setReorderList] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Fetch Low Stock Products on Component Mount
   useEffect(() => {
     fetchLowStockProducts();
+    fetchSuppliers();
   }, []);
 
-  
   const fetchLowStockProducts = async () => {
     try {
-      const response = await fetch("http://localhost:5000/products/low-stock"); // Ensure this URL is correct
-      if (!response.ok) {
-        throw new Error("Failed to fetch low-stock products.");
-      }
+      const response = await fetch("http://localhost:5000/products/low-stock");
+      if (!response.ok) throw new Error("Failed to fetch low-stock products.");
       const data = await response.json();
-      console.log("Low Stock Products Data:", data); // Debugging
-      setProducts(data.lowStockProducts || []); // Use the correct key from your API response
+      setProducts(data.lowStockProducts || []);
     } catch (error) {
       console.error("Error fetching low-stock products:", error);
-      alert("Could not fetch low-stock products. Please check the API or server connection.");
+      alert("Could not fetch low-stock products.");
     }
   };
 
-  // Add Product to Reorder List
+  const fetchSuppliers = async () => {
+    try {
+      const response = await fetch("/api/suppliers");
+      if (!response.ok) throw new Error("Failed to fetch suppliers.");
+      const data = await response.json();
+      setSuppliers(
+        data.suppliers.map((sup) => ({
+          value: sup.email,
+          label: sup.email,
+        }))
+      );
+    } catch (error) {
+      console.error("Error fetching suppliers:", error);
+      alert("Could not fetch suppliers.");
+    }
+  };
+
   const addToReorderList = (product) => {
     const alreadyInList = reorderList.some((item) => item.productId === product.productId);
     if (!alreadyInList) {
@@ -42,7 +56,6 @@ const ReorderManagement = () => {
     }
   };
 
-  // Mark Reorder as Processed
   const markAsProcessed = async () => {
     try {
       await Promise.all(
@@ -70,28 +83,38 @@ const ReorderManagement = () => {
     }
   };
 
-  // Notify Suppliers
   const notifySuppliers = async () => {
+    if (!selectedSupplier) {
+      alert("Please select a supplier to notify.");
+      return;
+    }
+
+    if (reorderList.length === 0) {
+      alert("Reorder list is empty. Add products to reorder before notifying.");
+      return;
+    }
+
     try {
-      const response = await fetch("http://localhost:5000/notify-suppliers", {
+      const response = await fetch("http://localhost:5000/api/notify-supplier", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reorderList }),
+        body: JSON.stringify({
+          email: selectedSupplier.value,
+          reorderItems: reorderList.map((item) => ({
+            name: item.name,
+            reorderQuantity: item.reorderQuantity,
+          })),
+        }),
       });
-  
-      if (response.ok) {
-        alert("Suppliers notified successfully!");
-      } else {
-        throw new Error("Failed to notify suppliers.");
-      }
+
+      if (!response.ok) throw new Error("Failed to notify supplier.");
+      alert(`Notification sent to ${selectedSupplier.label}`);
     } catch (error) {
-      console.error("Error notifying suppliers:", error);
-      alert("Error notifying suppliers.");
+      console.error("Error notifying supplier:", error);
+      alert("Failed to notify supplier.");
     }
   };
-  
 
-  // Toggle Light/Dark Mode
   const toggleDarkMode = () => {
     const newMode = isDarkMode ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", newMode);
@@ -105,9 +128,7 @@ const ReorderManagement = () => {
           <img src={kadeText} alt="Logo" className="sidebar-logo" />
         </h2>
         <ul className="sidebar-menu">
-          <li className="sidebar-item" onClick={() => navigate("/Dashboard")}>
-            Dashboard
-          </li>
+          <li className="sidebar-item" onClick={() => navigate("/Dashboard")}>Dashboard</li>
           <li className="sidebar-item" onClick={() => navigate("/ProductManagement")}>
             Product Management
           </li>
@@ -118,7 +139,7 @@ const ReorderManagement = () => {
           </li>
           <li className="sidebar-item">Reorder Management</li>
           <li className="sidebar-item" onClick={() => navigate("/UserManagement")}>User Management</li>
-          <li className="sidebar-item">Reporting and Analytics</li>
+          <li className="sidebar-item" onClick={() => navigate("/ReportingAndAnalytics")}>Reporting And Analytics</li>
           <li className="sidebar-item" onClick={() => navigate("/SystemSettings")}>System Settings</li>
           <li className="sidebar-item logout" onClick={() => navigate("/SignIn")}>
             Sign Out
@@ -134,33 +155,54 @@ const ReorderManagement = () => {
         </header>
         <div className="content-section">
           <h2>Low Stock Products</h2>
-          {products.length > 0 ? (
-            <ul className="product-list">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Stock</th>
+                <th>Reorder Level</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
               {products.map((product) => (
-                <li key={product.productId}>
-                  {product.name} (Stock: {product.stock}, Reorder Level: {product.reorderLevel})
-                  <button onClick={() => addToReorderList(product)}>Add to Reorder List</button>
-                </li>
+                <tr key={product.productId}>
+                  <td>{product.name}</td>
+                  <td>{product.stock}</td>
+                  <td>{product.reorderLevel}</td>
+                  <td>
+                    <button onClick={() => addToReorderList(product)}>Add to Reorder List</button>
+                  </td>
+                </tr>
               ))}
-            </ul>
-          ) : (
-            <p>No low stock products available.</p>
-          )}
+            </tbody>
+          </table>
 
           <h2>Reorder List</h2>
-          {reorderList.length > 0 ? (
-            <ul className="reorder-list">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Reorder Quantity</th>
+              </tr>
+            </thead>
+            <tbody>
               {reorderList.map((item, index) => (
-                <li key={index}>
-                  {item.name} (Reorder Quantity: {item.reorderQuantity})
-                </li>
+                <tr key={index}>
+                  <td>{item.name}</td>
+                  <td>{item.reorderQuantity}</td>
+                </tr>
               ))}
-            </ul>
-          ) : (
-            <p>No items in reorder list.</p>
-          )}
+            </tbody>
+          </table>
 
           <button onClick={markAsProcessed}>Mark as Processed</button>
+          <Select
+            className="supplier-select"
+            options={suppliers}
+            placeholder="Select Supplier"
+            onChange={setSelectedSupplier}
+          />
           <button onClick={notifySuppliers}>Notify Suppliers</button>
         </div>
       </main>

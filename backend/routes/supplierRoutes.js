@@ -149,6 +149,56 @@ router.delete("/suppliers:id", async (req, res) => {
   }
 });
 
+// Notify Supplier
+router.post("/api/notify-supplier", async (req, res) => {
+  const { email, reorderItems } = req.body; // Ensure reorderItems is destructured
+
+  try {
+    if (!email || !reorderItems || reorderItems.length === 0) {
+      return res.status(400).json({ error: "Email and reorder items are required." });
+    }
+
+    const emailHTML = `
+      <div style="font-family: Arial, sans-serif; padding: 20px; line-height: 1.5;">
+        <h2>Reorder Notification</h2>
+        <p>Dear Supplier,</p>
+        <p>The following products need to be reordered:</p>
+        <table border="1" cellspacing="0" cellpadding="10" style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background-color: #f2f2f2;">
+              <th>Product Name</th>
+              <th>Reorder Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${reorderItems.map(item => `
+              <tr>
+                <td>${item.name}</td>
+                <td>${item.reorderQuantity}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+        <p>Please process this order at your earliest convenience.</p>
+        <p>Thank you.<br><strong>Kade Management Team</strong></p>
+      </div>
+    `;
+
+    await transporter.sendMail({
+      from: '"Kade Management" <dinushadeshan4@gmail.com>',
+      to: email,
+      subject: "Reorder Request",
+      html: emailHTML,
+    });
+
+    res.status(200).json({ message: "Notification sent successfully." });
+  } catch (error) {
+    console.error("Error notifying supplier:", error);
+    res.status(500).json({ error: "Failed to send notification." });
+  }
+});
+
+
 
 
 module.exports = router;
