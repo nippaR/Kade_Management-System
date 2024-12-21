@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Select from "react-select"; // Install react-select
+import Select from "react-select";
 import "./ReorderManagement.css";
 import kadeText from "../images/kade2.png"; // Logo image
 
@@ -69,14 +69,12 @@ const ReorderManagement = () => {
               quantity: item.reorderQuantity,
             }),
           });
-          if (!response.ok) {
-            throw new Error(`Failed to log stock movement for ${item.name}`);
-          }
+          if (!response.ok) throw new Error(`Failed to log stock movement for ${item.name}`);
         })
       );
       alert("Reorder processed successfully!");
       setReorderList([]);
-      fetchLowStockProducts(); // Refresh the list
+      fetchLowStockProducts();
     } catch (error) {
       console.error("Error processing reorder:", error);
       alert("Error processing reorder.");
@@ -129,21 +127,15 @@ const ReorderManagement = () => {
         </h2>
         <ul className="sidebar-menu">
           <li className="sidebar-item" onClick={() => navigate("/Dashboard")}>Dashboard</li>
-          <li className="sidebar-item" onClick={() => navigate("/ProductManagement")}>
-            Product Management
-          </li>
+          <li className="sidebar-item" onClick={() => navigate("/ProductManagement")}>Product Management</li>
           <li className="sidebar-item" onClick={() => navigate("/SalesTracking")}>Sales Management</li>
           <li className="sidebar-item" onClick={() => navigate("/inventoryMonitoring")}>Inventory Monitoring</li>
-          <li className="sidebar-item" onClick={() => navigate("/SupplierManagement")}>
-            Supplier Management
-          </li>
+          <li className="sidebar-item" onClick={() => navigate("/SupplierManagement")}>Supplier Management</li>
           <li className="sidebar-item">Reorder Management</li>
           <li className="sidebar-item" onClick={() => navigate("/UserManagement")}>User Management</li>
           <li className="sidebar-item" onClick={() => navigate("/ReportingAndAnalytics")}>Reporting And Analytics</li>
           <li className="sidebar-item" onClick={() => navigate("/SystemSettings")}>System Settings</li>
-          <li className="sidebar-item logout" onClick={() => navigate("/SignIn")}>
-            Sign Out
-          </li>
+          <li className="sidebar-item logout" onClick={() => navigate("/SignIn")}>Sign Out</li>
         </ul>
       </aside>
       <main className="main-content">
@@ -155,46 +147,54 @@ const ReorderManagement = () => {
         </header>
         <div className="content-section">
           <h2>Low Stock Products</h2>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Stock</th>
-                <th>Reorder Level</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((product) => (
-                <tr key={product.productId}>
-                  <td>{product.name}</td>
-                  <td>{product.stock}</td>
-                  <td>{product.reorderLevel}</td>
-                  <td>
-                    <button onClick={() => addToReorderList(product)}>Add to Reorder List</button>
-                  </td>
+          {products.length > 0 ? (
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Product Name</th>
+                  <th>Stock</th>
+                  <th>Reorder Level</th>
+                  <th>Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {products.map((product) => (
+                  <tr key={product.productId}>
+                    <td>{product.name}</td>
+                    <td>{product.stock}</td>
+                    <td>{product.reorderLevel}</td>
+                    <td>
+                      <button onClick={() => addToReorderList(product)}>Add to Reorder List</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p>No low stock products available.</p>
+          )}
 
           <h2>Reorder List</h2>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Reorder Quantity</th>
-              </tr>
-            </thead>
-            <tbody>
-              {reorderList.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.name}</td>
-                  <td>{item.reorderQuantity}</td>
+          {reorderList.length > 0 ? (
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Product Name</th>
+                  <th>Reorder Quantity</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {reorderList.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.name}</td>
+                    <td>{item.reorderQuantity}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p>No items in reorder list.</p>
+          )}
 
           <button onClick={markAsProcessed}>Mark as Processed</button>
           <Select

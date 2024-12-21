@@ -1,4 +1,5 @@
 // Import dependencies
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -10,6 +11,7 @@ const nodemailer = require("nodemailer");
 const path = require("path");
 const fs = require("fs");
 const { User, ActivityLog } = require("./models/User");
+require('dotenv').config();
 
 
 
@@ -23,6 +25,7 @@ const storage = multer.diskStorage({
   },
 });
 const upload = multer({ storage });
+
 
 const app = express();
 
@@ -280,6 +283,7 @@ app.post("/api/restore", upload.single("backupFile"), (req, res) => {
 
   res.status(200).send("Backup restored successfully.");
 });
+
 
 // Start Server
 const PORT = 5000;

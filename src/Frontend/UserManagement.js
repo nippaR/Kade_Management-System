@@ -47,9 +47,11 @@ const UserManagement = () => {
       .catch((error) => console.error("Error adding user:", error));
   };
 
-  const handleResetPassword = (id) => {
-    fetch(`/api/users/${id}/reset-password`, {
+  const handleResetPassword = (id, username, email) => {
+    fetch(`http://localhost:3000/api/users/${id}/reset-password`, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, email }), // Send user data to backend
     })
       .then((response) => response.json())
       .then((data) => {
@@ -99,8 +101,8 @@ const UserManagement = () => {
           <img src={kadeText} alt="Logo" className="sidebar-logo" />
         </h2>
         <ul className="sidebar-menu">
-        <li className="sidebar-item" onClick={() => navigate("/Dashboard")}>Dashboard</li>
-        <li className="sidebar-item" onClick={() => navigate("/ProductManagement")}>Product Management</li>
+          <li className="sidebar-item" onClick={() => navigate("/Dashboard")}>Dashboard</li>
+          <li className="sidebar-item" onClick={() => navigate("/ProductManagement")}>Product Management</li>
           <li className="sidebar-item" onClick={() => navigate("/SalesTracking")}>Sales Management</li>
           <li className="sidebar-item" onClick={() => navigate("/inventoryMonitoring")}>Inventory Monitoring</li>
           <li className="sidebar-item" onClick={() => navigate("/SupplierManagement")}>Supplier Management</li>
@@ -108,9 +110,7 @@ const UserManagement = () => {
           <li className="sidebar-item" onClick={() => navigate("/UserManagement")}>User Management</li>
           <li className="sidebar-item" onClick={() => navigate("/ReportingAndAnalytics")}>Reporting And Analytics</li>
           <li className="sidebar-item" onClick={() => navigate("/SystemSettings")}>System Settings</li>
-          <li className="sidebar-item logout" onClick={handleSignOut}>
-            Sign Out
-          </li>
+          <li className="sidebar-item logout" onClick={handleSignOut}>Sign Out</li>
         </ul>
       </aside>
       <main className="main-content">
@@ -142,26 +142,25 @@ const UserManagement = () => {
             <tbody>
               {Array.isArray(users) && users.length > 0 ? (
                 users
-              .filter((user) => user && user._id) // Filter out invalid entries
-                 .map((user) => (
-                   <tr key={user._id}>
-                     <td>{user._id}</td>
-                     <td>{user.username}</td>
-                     <td>{user.email}</td>
-                     <td>{user.role}</td>
-                     <td>
-                     <button onClick={() => handleResetPassword(user._id)}>Reset Password</button>
-                    <button onClick={() => viewActivityLogs(user._id)}>View Logs</button>
-          </td>
-        </tr>
-      ))
-  ) : (
-    <tr>
-      <td colSpan="5">No users found.</td>
-    </tr>
-  )}
-</tbody>
-
+                  .filter((user) => user && user._id) // Filter out invalid entries
+                  .map((user) => (
+                    <tr key={user._id}>
+                      <td>{user._id}</td>
+                      <td>{user.username}</td>
+                      <td>{user.email}</td>
+                      <td>{user.role}</td>
+                      <td>
+                        <button onClick={() => handleResetPassword(user._id, user.username, user.email)}>Reset Password</button>
+                        <button onClick={() => viewActivityLogs(user._id)}>View Logs</button>
+                      </td>
+                    </tr>
+                  ))
+              ) : (
+                <tr>
+                  <td colSpan="5">No users found.</td>
+                </tr>
+              )}
+            </tbody>
           </table>
         </section>
 

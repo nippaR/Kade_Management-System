@@ -150,13 +150,17 @@ router.delete("/suppliers:id", async (req, res) => {
 });
 
 // Notify Supplier
-router.post("/api/notify-supplier", async (req, res) => {
-  const { email, reorderItems } = req.body; // Ensure reorderItems is destructured
-
+router.post("/notify-supplier", async (req, res) => {
   try {
+    const { email, reorderItems } = req.body;
+
     if (!email || !reorderItems || reorderItems.length === 0) {
+      console.error("Missing email or reorder items:", req.body);
       return res.status(400).json({ error: "Email and reorder items are required." });
     }
+
+    console.log("Sending email to:", email);
+    console.log("Reorder items:", reorderItems);
 
     const emailHTML = `
       <div style="font-family: Arial, sans-serif; padding: 20px; line-height: 1.5;">
@@ -193,11 +197,10 @@ router.post("/api/notify-supplier", async (req, res) => {
 
     res.status(200).json({ message: "Notification sent successfully." });
   } catch (error) {
-    console.error("Error notifying supplier:", error);
+    console.error("Error sending email:", error);
     res.status(500).json({ error: "Failed to send notification." });
   }
 });
-
 
 
 

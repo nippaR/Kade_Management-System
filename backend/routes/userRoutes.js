@@ -1,6 +1,9 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
 const { User, ActivityLog } = require("../models/User");
+const crypto = require("crypto");
+
 
 const router = express.Router();
 
@@ -61,23 +64,68 @@ router.post("/signin", async (req, res) => {
   }
 });
 
-// Reset Password (Logs Activity)
+
+// Configure Nodemailer Transporter
+const transporter = nodemailer.createTransport({
+  service: "gmail", // Use your email service (e.g., Gmail, Outlook, etc.)
+  auth: {
+    user: "dinushadeshan4@gmail.com", // Replace with your email
+    pass: "oqax fsvx gtue mlmb", // Replace with your email password or app password
+  },
+});
+
+// Reset Password with Email
 router.post("/:id/reset-password", async (req, res) => {
   const { id } = req.params;
+  const { username, email } = req.body;
+
   try {
     const user = await User.findById(id);
     if (!user) return res.status(404).json({ message: "User not found." });
+
+    if (user.username !== username || user.email !== email) {
+      return res.status(400).json({ message: "User data mismatch." });
+    }
+
+    // Generate a password reset token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetTokenExpires = Date.now() + 3600000; // Token valid for 1 hour
+
+    user.resetToken = resetToken;
+    user.resetTokenExpires = resetTokenExpires;
+    await user.save();
+
+    // Construct the password reset URL
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+
+    // Send the reset email
+    const mailOptions = {
+      from: '"Kade.LK Management" <dinushadeshan4@gmail.com>',
+      to: user.email,
+      subject: "Password Reset Request",
+      html: `
+        <h2>Password Reset Request for ${user.username} </h2>
+        <p>Hi ${user.username},</p>
+        <p>You requested a password reset. Please click the link below to reset your password:</p>
+        <a href="${resetUrl}" target="_blank">Reset Password</a>
+        <p>If you did not request this, please ignore this email.</p>
+        <p><strong>Kade Management Team</strong></p>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
 
     // Log Activity
     const log = new ActivityLog({
       userId: id,
       activity: "Password Reset",
-      description: "Password reset link sent.",
+      description: "Password reset link sent to email.",
     });
     await log.save();
 
-    res.json({ message: "Password reset link sent.", log });
+    res.json({ message: "Password reset link sent to your email address.", log });
   } catch (err) {
+    console.error("Error sending password reset email:", err.message, err.stack);
     res.status(500).json({ message: "Server error. Please try again later." });
   }
 });

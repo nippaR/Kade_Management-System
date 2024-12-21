@@ -8,6 +8,8 @@ const userSchema = new mongoose.Schema({
   profilePicture: { type: String, default: "path/to/defaultPicture.jpg" },
   role: { type: String, enum: ["Admin", "Assistant"], default: "Assistant" }, // Added role
   createdAt: { type: Date, default: Date.now }, // Added createdAt
+  resetToken: {type:String,required: true },
+  resetTokenExpires: {type:Date,required: true }
 });
 
 // Activity Log Schema
